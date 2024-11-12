@@ -19,19 +19,16 @@ camera.position.set(0, 2, 3)
 const canvas = document.getElementById('canvas') as HTMLCanvasElement
 const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true })
 renderer.setSize(window.innerWidth, window.innerHeight)
-// document.body.appendChild(renderer.domElement)
 
-// window.addEventListener('resize', () => {
-//   camera.aspect = window.innerWidth / window.innerHeight
-//   camera.updateProjectionMatrix()
-//   renderer.setSize(window.innerWidth, window.innerHeight)
-// })
 
 // CONTROLS
-const controls = new OrbitControls(camera, renderer.domElement)
-controls.addEventListener('change', () => {
-  renderer.render(sceneA, camera)
-})
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.05;
+controls.enablePan = false; // Disable panning when locked on target
+controls.enableZoom = true; // Allow zooming if desired
+
+
 const geometry = new THREE.BoxGeometry()
 const material = new THREE.MeshNormalMaterial({ wireframe: true })
 
@@ -39,6 +36,11 @@ const material = new THREE.MeshNormalMaterial({ wireframe: true })
 const cube = new THREE.Mesh(geometry, material)
 cube.position.y = .5
 sceneA.add(cube)
+
+// PIVOT POINT FOR CAMERA ORBIT
+const pivot = new THREE.Object3D();
+pivot.position.copy(cube.position); // Set pivot at the cube's position
+sceneA.add(pivot);
 
 // GUI STATS (FPS)
 const stats = new Stats()
@@ -62,26 +64,64 @@ cameraFolder.add(camera.position, "x", -20, 20)
 cameraFolder.add(camera.position, "y", 0, 50)
 cameraFolder.add(camera.position, "z", 0, 20)
 
+// Key movement setup
+const movementSpeed = 0.1;
+const keyState = {
+  w: false,
+  a: false,
+  s: false,
+  d: false,
+};
 
-const clock = new THREE.Clock()
-let delta
+function handleKeyDown(event) {
+  if (keyState.hasOwnProperty(event.key)) keyState[event.key] = true;
+}
 
+function handleKeyUp(event) {
+  if (keyState.hasOwnProperty(event.key)) keyState[event.key] = false;
+}
+
+function updateCubePosition() {
+  if (keyState.w) cube.position.z -= movementSpeed; // Move forward
+  if (keyState.s) cube.position.z += movementSpeed; // Move backward
+  if (keyState.a) cube.position.x -= movementSpeed; // Move left
+  if (keyState.d) cube.position.x += movementSpeed; // Move right
+}
+
+// Add event listeners for key controls
+window.addEventListener('keydown', handleKeyDown);
+window.addEventListener('keyup', handleKeyUp);
+
+// Lock-on target control with camera pivot 
+const guiControls = {
+  lockOnTarget: false,
+};
+cameraFolder.add(guiControls, 'lockOnTarget').name('Lock on Target').onChange((value) => {
+  if (value) {
+    controls.target.copy(cube.position); // Lock controls target to cube
+    controls.enablePan = false; // Disable panning when locked on target
+  } else {
+    controls.target.set(0, 0, 0); // Reset controls target to default
+    controls.enablePan = true; // Re-enable panning if desired
+  }
+  controls.update(); // Update controls to reflect changes
+});
+
+const clock = new THREE.Clock();
 // ANIMATION
 function animate() {
-  // set framerate
-  // setTimeout(function () {
-  // place animations in here for fps changes
-  // }, 1000 / 100);
-
-  delta = clock.getDelta()
-  // cube.rotation.y += .4 * delta
+  const delta = clock.getDelta();
   requestAnimationFrame(animate);
 
-  camera.lookAt(0, 0.5, 0)
+  if (guiControls.lockOnTarget) {
+    // Continuously update the target to follow the cube's position
+    controls.target.copy(cube.position);
+  }
 
-
-  renderer.render(sceneA, camera)
-  stats.update()
+  updateCubePosition(); // Update cube position based on key inputs
+  controls.update(); // Update OrbitControls every frame
+  renderer.render(sceneA, camera);
+  stats.update();
 }
 
 animate()

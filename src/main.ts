@@ -15,8 +15,8 @@ canvas.addEventListener('click', () => {
 });
 
 const { scene, cube } = setupScene();
-const { camera, radius, spherical } = setupCamera(cube.position);
-setupCameraControls(spherical, camera, cube.position); // Set up camera controls with spherical coordinates
+const { camera, spherical } = setupCamera(cube.position);
+setupCameraControls(spherical, camera, cube.position, cube); // Set up camera controls with spherical coordinates
 setupUserControls();
 
 const stats = new Stats();

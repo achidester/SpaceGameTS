@@ -34,7 +34,7 @@ export function setupCamera(center: THREE.Vector3): { camera: THREE.PerspectiveC
     const deltaY = event.movementY || 0;
   
     // Adjust spherical coordinates based on mouse movement
-    spherical.theta -= deltaX * 0.0015; // Horizontal orbit
+    spherical.theta -= deltaX * 0.00125; // Horizontal orbit
     spherical.phi -= deltaY * 0.001;   // Vertical orbit
   
     // Clamp phi to prevent flipping over the poles

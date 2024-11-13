@@ -16,9 +16,27 @@ function handleKeyUp(event: KeyboardEvent) {
   if (keyState.hasOwnProperty(event.key)) keyState[event.key as keyof typeof keyState] = false;
 }
 
-export function updateCubePosition(cube: THREE.Mesh) {
-  if (keyState.w) cube.position.z -= movementSpeed;
-  if (keyState.s) cube.position.z += movementSpeed;
-  if (keyState.a) cube.position.x -= movementSpeed;
-  if (keyState.d) cube.position.x += movementSpeed;
+export function updateObjectPosition(object: THREE.Object3D, camera: THREE.PerspectiveCamera) {
+  const moveDirection = new THREE.Vector3();
+  const forward = new THREE.Vector3();
+  camera.getWorldDirection(forward);
+  forward.y = 0; // Ignore vertical component for movement
+  forward.normalize();
+
+  const right = new THREE.Vector3();
+  right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+  // Accumulate movement direction based on WASD input
+  if (keyState.w) moveDirection.add(forward);
+  if (keyState.s) moveDirection.sub(forward);
+  if (keyState.a) moveDirection.sub(right);
+  if (keyState.d) moveDirection.add(right);
+
+  if (moveDirection.length() > 0) {
+    moveDirection.normalize();
+    object.position.add(moveDirection.multiplyScalar(movementSpeed));
+
+    // Align the object's rotation with the camera's horizontal rotation
+    object.rotation.y = Math.atan2(forward.x, forward.z);
+  }
 }

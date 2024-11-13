@@ -15,8 +15,8 @@ canvas.addEventListener('click', () => {
 });
 
 const { scene, cube } = setupScene();
-const { camera, radius, spherical } = setupCamera();
-setupCameraControls(spherical, camera); // Set up camera controls with spherical coordinates
+const { camera, radius, spherical } = setupCamera(cube.position);
+setupCameraControls(spherical, camera, cube.position); // Set up camera controls with spherical coordinates
 setupUserControls();
 
 const stats = new Stats();
@@ -30,7 +30,11 @@ cubeFolder.add(cube.position, "z", -5, 5);
 function animate() {
   requestAnimationFrame(animate);
 
-  updateObjectPosition(cube, camera); // Move cube based on camera orientation
+  // Move cube based on camera orientation and user input
+  updateObjectPosition(cube, camera);
+
+  // Update camera position to follow the cube, keeping the azimuthal orbit
+  updateCameraPosition(camera, spherical, cube.position);
 
   renderer.render(scene, camera);
   stats.update();

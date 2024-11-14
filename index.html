@@ -9,6 +9,29 @@
 
   <body>
     <canvas id="canvas" width="50" height="50"></canvas>
+
+    <!-- Pause overlay for indicating the game is paused -->
+    <div
+    id="pauseOverlay"
+    style="
+      display: none;
+      position: fixed;  /* Use fixed to cover entire screen */
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2em;
+      z-index: 10;  /* Ensure overlay is above other elements */
+    "
+  >
+    Game Paused
+  </div>
+    
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

@@ -18,6 +18,9 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
   let isPointerLocked = false;
   let accumulatedMouseX = 0;
   let accumulatedMouseY = 0;
+  
+  // Set the fixed reticle distance
+  const reticleDistance = 50;
 
   // Detect pointer lock status
   document.addEventListener('pointerlockchange', () => {
@@ -28,7 +31,7 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
   window.addEventListener('mousemove', (event) => {
     if (isPointerLocked) {
       // Use relative movement values when pointer is locked
-      accumulatedMouseX += event.movementX * 0.002; // Adjust sensitivity as needed
+      accumulatedMouseX += event.movementX * 0.002; // Adjust sensitivity as neededsa
       accumulatedMouseY -= event.movementY * 0.002;
 
       // Clamp values to keep reticle within bounds (e.g., [-1, 1])
@@ -41,7 +44,6 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
     }
 
     // Set a fixed distance from the camera for the reticle
-    const reticleDistance = 20;
 
     // Create a 3D position based on normalized coordinates and unproject
     const reticlePosition = new THREE.Vector3(accumulatedMouseX, accumulatedMouseY, -1).unproject(camera);

@@ -21,19 +21,26 @@ canvas.addEventListener('click', () => {
 const { scene, player } = setupScene();
 // Set up the camera and controls
 const { camera } = setupCamera(player.mesh.position);
-
+const reticle = createReticle(camera, scene);
 setupUserControls();
 
 // Set up stats and GUI for debugging
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 const gui = new GUI();
+
 const cubeFolder = gui.addFolder("CUBE position");
 cubeFolder.add(player.mesh.position, "x", -5, 5);
 cubeFolder.add(player.mesh.position, "y", 0, 5);
 cubeFolder.add(player.mesh.position, "z", -5, 5);
 
-const reticle = createReticle(camera, scene);
+const cameraFolder = gui.addFolder("CAMERA controls");
+cameraFolder.add(camera.position, "x", -10, 10);
+cameraFolder.add(camera.position, "y", -10, 10);
+cameraFolder.add(camera.position, "z", -10, 10);
+cameraFolder.open()
+
+
 
 // Initialize projectiles and enemies
 const projectiles: Projectile[] = [];
@@ -48,10 +55,37 @@ window.addEventListener('mousedown', (event) => {
     const projectile = player.shoot(scene, reticlePosition);
     if (projectile) projectiles.push(projectile);
   }
+}); 
+
+let paused = false;
+
+const pauseOverlay = document.getElementById("pauseOverlay");
+if (pauseOverlay) {
+  pauseOverlay.style.display = "none";
+}
+
+window.addEventListener('keydown', (event) => {
+  if (event.key === 'Tab') {
+    paused = !paused;
+    if (pauseOverlay) {
+      if (paused) {
+        // Temporarily hide and re-show to force repaint
+        pauseOverlay.style.display = "none";
+        setTimeout(() => pauseOverlay.style.display = "flex", 0);
+      } else {
+        pauseOverlay.style.display = "none";
+      }
+    }
+  }
 });
 
 function animate() {
   requestAnimationFrame(animate);
+
+  if (paused) {
+    // Game is paused, skip the rest of the updates
+    return;
+  }
 
   // Spawn enemies at intervals
   if (Date.now() - enemySpawnTimer > spawnInterval) {

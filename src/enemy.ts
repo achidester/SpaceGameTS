@@ -12,35 +12,38 @@ export function spawnEnemy() {
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const enemy = new THREE.Mesh(geometry, material);
 
-    const { x, z } = spawnPositionInFrontOfPlayer(player.position, minSpawnDistance, maxSpawnDistance);
-    enemy.position.set(x, 0, z);
+    // Use player position to spawn enemies near the screen center
+    const spawnPosition = spawnPositionNearCenter(player.position, minSpawnDistance, maxSpawnDistance);
+    enemy.position.set(spawnPosition.x, spawnPosition.y, spawnPosition.z);
 
     scene.add(enemy);
     return enemy;
 }
 
-// Generate a random position in front of the player
-function spawnPositionInFrontOfPlayer(playerPosition: THREE.Vector3, minDistance: number, maxDistance: number) {
-    // Calculate forward direction based on the player's rotation
-    const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(player.mesh.quaternion).normalize();
+function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: number, maxDistance: number) {
+    // Define a forward direction in world space (e.g., along the negative z-axis)
+    const forward = new THREE.Vector3(0, 0, 3);
 
     // Randomize a distance within the defined range
     const distance = Math.random() * (maxDistance - minDistance) + minDistance;
 
-    // Add some randomness to the position in front of the player
-    const offsetX = (Math.random() - 0.5) * 5; // Adjust the spread as needed
-    const offsetZ = distance;
+    // Add some randomness to create a spread around the center of the screen
+    const offsetX = (Math.random() - 0.5) * 10; // Horizontal spread
+    const offsetY = (Math.random() - 0.5) * 5;  // Vertical spread
 
-    // Calculate the spawn position based on the forward direction
-    const spawnX = playerPosition.x + forward.x * offsetZ + offsetX;
-    const spawnZ = playerPosition.z + forward.z * offsetZ;
+    // Calculate spawn position based on the player’s position
+    const spawnPosition = new THREE.Vector3(
+        playerPosition.x + forward.x * distance + offsetX,
+        playerPosition.y + offsetY,
+        playerPosition.z + forward.z * distance
+    );
 
-    return { x: spawnX, z: spawnZ };
+    return spawnPosition;
 }
 
 // Move the enemy toward the player
 export function moveEnemy(enemy: THREE.Mesh) {
     const direction = new THREE.Vector3();
     direction.subVectors(player.position, enemy.position).normalize();
-    enemy.position.add(direction.multiplyScalar(0.02));
+    enemy.position.add(direction.multiplyScalar(0.075));
 }

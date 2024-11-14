@@ -11,8 +11,8 @@ export class Player {
       new THREE.BoxGeometry(),
       new THREE.MeshNormalMaterial({ wireframe: true })
     );
-    this.mesh.position.y = 0.5;
-    this.mesh.position.z = 10;
+    this.mesh.position.y = 0;
+    this.mesh.position.z = 5;
     this.fireRate = 100; // Fire rate set to 500 ms (0.5 seconds)
     this.lastShotTime = 0;
   }

@@ -10,7 +10,7 @@ export class Projectile {
   constructor(position: THREE.Vector3, direction: THREE.Vector3, speed: number = 0.2, maxRange: number = 50) {
     this.mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.1, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0xff0000 })
+      new THREE.MeshBasicMaterial({ color: 0x0BFF3F })
     );
     this.mesh.position.copy(position);
 

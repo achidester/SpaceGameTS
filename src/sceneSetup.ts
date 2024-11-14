@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Player } from './player';
 
 export function setupScene() {
   const scene = new THREE.Scene();
@@ -6,14 +7,10 @@ export function setupScene() {
     .setPath('https://sbcode.net/img/')
     .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png']);
 
-  const cube = new THREE.Mesh(
-    new THREE.BoxGeometry(),
-    new THREE.MeshNormalMaterial({ wireframe: true })
-  );
-  cube.position.y = 0.5;
-  scene.add(cube);
+  const player = new Player();
+  scene.add(player.mesh);
 
   scene.add(new THREE.GridHelper());
 
-  return { scene, cube };
+  return { scene, player };
 }

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 
-const movementSpeed = 0.1;
+const verticalMovementSpeed = 0.05; // Speed for W and S keys
+const horizontalMovementSpeed = 0.05; // Separate speed for A and D keys
 const keyState: Record<string, boolean> = { w: false, a: false, s: false, d: false };
 
 export function setupUserControls() {
@@ -20,21 +21,21 @@ export function updateObjectPosition(object: THREE.Object3D, camera: THREE.Persp
   const moveDirection = new THREE.Vector3();
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
-  forward.y = 0; // Ignore vertical component for movement
+  forward.y = 0; // Ignore vertical component for horizontal movement
   forward.normalize();
 
   const right = new THREE.Vector3();
   right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
 
-  // Accumulate movement direction based on WASD input
-  if (keyState.w) moveDirection.add(forward);
-  if (keyState.s) moveDirection.sub(forward);
-  if (keyState.a) moveDirection.sub(right);
-  if (keyState.d) moveDirection.add(right);
+  // Accumulate movement direction based on WASD input with separate speeds
+  if (keyState.w) moveDirection.y += verticalMovementSpeed; // Move up along Y-axis
+  if (keyState.s) moveDirection.y -= verticalMovementSpeed; // Move down along Y-axis
+  if (keyState.a) moveDirection.sub(right.multiplyScalar(horizontalMovementSpeed)); // Move left
+  if (keyState.d) moveDirection.add(right.multiplyScalar(horizontalMovementSpeed)); // Move right
 
+  // Apply movement to the object
   if (moveDirection.length() > 0) {
-    moveDirection.normalize();
-    object.position.add(moveDirection.multiplyScalar(movementSpeed));
+    object.position.add(moveDirection);
 
     // Align the object's rotation with the camera's horizontal rotation
     object.rotation.y = Math.atan2(forward.x, forward.z);

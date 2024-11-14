@@ -35,7 +35,7 @@ cubeFolder.add(player.mesh.position, "z", -5, 5);
 
 // Set up reticle target
 function createReticle() {
-  const reticleGeometry = new THREE.SphereGeometry(3, 10, 10); // Adjust size as needed
+  const reticleGeometry = new THREE.SphereGeometry(2, 10, 10); // Adjust size as needed
   const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0xd6d63e, transparent: true, opacity: .5 });
   const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
 

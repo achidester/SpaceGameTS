@@ -7,6 +7,7 @@ import { setupCamera } from './cameraControls';
 import { setupUserControls, updateObjectPosition } from './userControls';
 import { Projectile } from './projectile';
 import { spawnEnemy, moveEnemy } from './enemy';
+import { createReticle } from './reticle';
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -18,10 +19,9 @@ canvas.addEventListener('click', () => {
 
 // Set up the scene and player
 const { scene, player } = setupScene();
-
 // Set up the camera and controls
 const { camera } = setupCamera(player.mesh.position);
-// setupCameraControls(camera, player.mesh.position, player.mesh); // Set up camera controls
+
 setupUserControls();
 
 // Set up stats and GUI for debugging
@@ -33,56 +33,7 @@ cubeFolder.add(player.mesh.position, "x", -5, 5);
 cubeFolder.add(player.mesh.position, "y", 0, 5);
 cubeFolder.add(player.mesh.position, "z", -5, 5);
 
-// Set up reticle target
-function createReticle() {
-  const reticleGeometry = new THREE.SphereGeometry(2, 10, 10); // Adjust size as needed
-  const reticleMaterial = new THREE.MeshBasicMaterial({ color: 0xd6d63e, transparent: true, opacity: .5 });
-  const reticle = new THREE.Mesh(reticleGeometry, reticleMaterial);
-
-  // Start with the reticle positioned in front of the camera at a distance
-  reticle.position.set(0, 0, -10);
-
-  return reticle;
-}
-
-const reticle = createReticle();
-scene.add(reticle); // Add the reticle independently to the scene
-
-// Mousemove event listener to move the reticle based on mouse position
-let isPointerLocked = false;
-let accumulatedMouseX = 0;
-let accumulatedMouseY = 0;
-
-// Detect pointer lock status
-document.addEventListener('pointerlockchange', () => {
-  isPointerLocked = !!document.pointerLockElement;
-});
-
-window.addEventListener('mousemove', (event) => {
-  if (isPointerLocked) {
-    // Use relative movement values when pointer is locked
-    accumulatedMouseX += event.movementX * 0.002; // Adjust sensitivity as needed
-    accumulatedMouseY -= event.movementY * 0.002;
-
-    // Clamp values to keep reticle within bounds (e.g., [-1, 1])
-    accumulatedMouseX = Math.max(-1, Math.min(1, accumulatedMouseX));
-    accumulatedMouseY = Math.max(-1, Math.min(1, accumulatedMouseY));
-  } else {
-    // Use absolute position values when pointer is not locked
-    accumulatedMouseX = (event.clientX / window.innerWidth) * 2 - 1;
-    accumulatedMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-  }
-
-  // Set a fixed distance from the camera for the reticle
-  const reticleDistance = 60;
-  
-  // Create a 3D position based on normalized coordinates and unproject
-  const reticlePosition = new THREE.Vector3(accumulatedMouseX, accumulatedMouseY, -1).unproject(camera);
-  
-  // Calculate direction and position the reticle
-  const direction = reticlePosition.sub(camera.position).normalize();
-  reticle.position.copy(camera.position).add(direction.multiplyScalar(reticleDistance));
-});
+const reticle = createReticle(camera, scene);
 
 // Initialize projectiles and enemies
 const projectiles: Projectile[] = [];

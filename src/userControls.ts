@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Player } from './player'; 
 
 const verticalMovementSpeed = 0.05; // Speed for W and S keys
 const horizontalMovementSpeed = 0.05; // Separate speed for A and D keys
@@ -17,7 +18,7 @@ function handleKeyUp(event: KeyboardEvent) {
   if (keyState.hasOwnProperty(event.key)) keyState[event.key as keyof typeof keyState] = false;
 }
 
-export function updateObjectPosition(object: THREE.Object3D, camera: THREE.PerspectiveCamera) {
+export function updateObjectPosition(player: Player, camera: THREE.PerspectiveCamera) {
   const moveDirection = new THREE.Vector3();
   const forward = new THREE.Vector3();
   camera.getWorldDirection(forward);
@@ -35,9 +36,10 @@ export function updateObjectPosition(object: THREE.Object3D, camera: THREE.Persp
 
   // Apply movement to the object
   if (moveDirection.length() > 0) {
-    object.position.add(moveDirection);
+    player.mesh.position.add(moveDirection);
+    player.mesh.rotation.y = Math.atan2(forward.x, forward.z);
 
-    // Align the object's rotation with the camera's horizontal rotation
-    object.rotation.y = Math.atan2(forward.x, forward.z);
+    // Update enemy target to stay behind the player
+    player.updateEnemyTarget();
   }
 }

@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { scene } from './sceneSetup';
 import { player } from './sceneSetup'; // Import player to access position
+import { Player } from './player'; // Import player to access position
 
 const enemySize = 1;
 const minSpawnDistance = 10;
 const maxSpawnDistance = 20; // Define a max distance to control where enemies spawn
+const enemySpeed = .08; // Define a max distance to control where enemies spawn
 
 // Function to spawn an enemy
 export function spawnEnemy() {
@@ -42,8 +44,24 @@ function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: num
 }
 
 // Move the enemy toward the player
-export function moveEnemy(enemy: THREE.Mesh) {
+export function moveEnemy(enemy: THREE.Mesh, player: Player, scene: THREE.Scene, enemies: THREE.Mesh[]) {
     const direction = new THREE.Vector3();
-    direction.subVectors(player.position, enemy.position).normalize();
+    direction.subVectors(player.enemyTarget, enemy.position).normalize();
+  
+    // Move the enemy in the direction of the target
     enemy.position.add(direction.multiplyScalar(0.075));
-}
+  
+    // Check if the enemy has reached or passed the target’s Z position
+    if (enemy.position.z <= player.enemyTarget.z) {
+      // Remove the enemy from the scene
+      scene.remove(enemy);
+  
+      // Optionally, remove the enemy from the enemies array
+      const index = enemies.indexOf(enemy);
+      if (index > -1) {
+        enemies.splice(index, 1);
+      }
+  
+      console.log("Enemy destroyed after passing target Z position!");
+    }
+  }

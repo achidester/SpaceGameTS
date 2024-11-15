@@ -96,7 +96,7 @@ function animate() {
 
   // Move each enemy toward the player and check for collisions
   enemies.forEach((enemy, enemyIndex) => {
-    moveEnemy(enemy);
+    moveEnemy(enemy, player, scene, enemies);
 
     // Check for collisions with projectiles
     projectiles.forEach((projectile, projectileIndex) => {
@@ -132,7 +132,7 @@ function animate() {
   });
 
   // Update player position based on input
-  updateObjectPosition(player.mesh, camera);
+  updateObjectPosition(player, camera);
 
   // Make the player cube face the reticle
   player.mesh.lookAt(reticle.getWorldPosition(new THREE.Vector3()));

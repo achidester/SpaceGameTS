@@ -11,12 +11,15 @@
   <body>
     <div id="ui">
       <div id="playerHealthBarContainer">
-        <div id="playerHealthBar"></div>
+        <div id="playerHealthBar">HP</div>
       </div>
     </div>
     <canvas id="canvas" width="50" height="50"></canvas>
 
     <div id="pauseOverlay">Game Paused</div>
+    <div id="deathOverlay"><p>You Died</p>
+      <button id="refreshButton">Restart</button>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

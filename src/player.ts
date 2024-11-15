@@ -38,8 +38,20 @@ export class Player {
       this.healthBar.style.width = `${healthPercentage}%`;
     }
   }
-
-
+  showDeathScreen() {
+    if (this.health > 0) return;
+    const deathOverlay = document.getElementById("deathOverlay");
+    if (deathOverlay) {
+      console.log("Showing death screen.");
+      deathOverlay.style.display = "flex";
+    }
+    const refreshButton = document.getElementById("refreshButton");
+    if (refreshButton) {
+      refreshButton.addEventListener("click", () => {
+        location.reload(); // Reload the page
+      });
+    }
+  }
   takeDamage(damage: number) {
     this.health -= damage;
     this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
@@ -47,7 +59,8 @@ export class Player {
 
     if (this.health <= 0) {
       console.log("Player has died!");
-      // Handle death logic here
+      this.showDeathScreen();
+      // Additional death logic, e.g., stopping the game
     }
   }
 

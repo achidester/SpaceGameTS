@@ -16,7 +16,7 @@ body {
   #playerHealthBarContainer {
     position: absolute;
     bottom: 10px; /* Adjust as needed */
-    left: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
     width: 200px;
     height: 20px;
     background-color: #333; /* Background for the health bar container */
@@ -47,4 +47,24 @@ body {
       align-items: center;
       font-size: 2em;
       z-index: 10;  /* Ensure overlay is above other elements */
+  }
+
+  #deathOverlay {
+    display: none; /* Hidden by default */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 2em;
+    z-index: 15; /* Higher than other overlays */
+  }
+
+  #deathOverlay button:hover {
+    background: #30cc00;
   }

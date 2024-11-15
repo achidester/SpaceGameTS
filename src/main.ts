@@ -85,9 +85,15 @@ function animate() {
 
   if (paused) {
     // Game is paused, skip the rest of the updates
+    document.exitPointerLock();
     return;
   }
-
+  if (player.health <= 0) {
+    // Player dead, stop game
+    document.exitPointerLock();
+    return;
+  }
+  
   // Spawn enemies at intervals
   if (Date.now() - enemySpawnTimer > spawnInterval) {
     const enemy = spawnEnemy();
@@ -114,7 +120,8 @@ function animate() {
     const distanceToPlayer = enemy.position.distanceTo(player.position);
     if (distanceToPlayer < 1) {
       // Handle collision or player damage here if needed
-      player.takeDamage(20);
+      player.takeDamage(50);
+      
       scene.remove(enemy);
       enemies.splice(enemyIndex, 1);
     }

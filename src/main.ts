@@ -27,6 +27,8 @@ setupUserControls();
 // Set up stats and GUI for debugging
 const stats = new Stats();
 document.body.appendChild(stats.dom);
+
+console.log("Stats DOM:", stats.dom);
 const gui = new GUI();
 
 const cubeFolder = gui.addFolder("CUBE position");
@@ -57,6 +59,7 @@ window.addEventListener('mousedown', (event) => {
     if (projectile) projectiles.push(projectile);
   }
 }); 
+
 
 let paused = false;
 

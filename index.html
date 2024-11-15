@@ -1,26 +1,30 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <link rel="stylesheet" href="./src/style.css" />
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Space Game By Alex Chidester</title>
+    <title>Space Game</title>
   </head>
 
   <body>
-    <div id="ui">
-      <div id="playerHealthBarContainer">
-        <div id="playerHealthBar">HP</div>
+    <div id="gameContainer">
+      <canvas id="canvas" width="50" height="50"></canvas>
+      
+      <div id="ui">
+        <div id="playerHealthBarContainer">
+          <div id="playerHealthBar">HP</div>
+        </div>
       </div>
-    </div>
-    <canvas id="canvas" width="50" height="50"></canvas>
+      
+      <div id="pauseOverlay">Game Paused</div>
 
-    <div id="pauseOverlay">Game Paused</div>
-    <div id="deathOverlay"><p>You Died</p>
-      <button id="refreshButton">Restart</button>
-    </div>
+      <div id="deathOverlay">
+        <p>You Died</p>
+        <button id="refreshButton">Restart</button>
+      </div>
 
+    </div>
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

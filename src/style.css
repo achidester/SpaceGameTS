@@ -3,6 +3,19 @@ body {
     margin: 0px;
   }
 
+  #gameContainer {
+    position: relative; /* Anchor the game container */
+    width: 100vw; /* Make it fill the viewport width */
+    height: 100vh; /* Make it fill the viewport height */
+    overflow: hidden; /* Prevent scrollbars */
+  }
+
+  #canvas {
+    display: block;
+    width: 100%; /* Match parent dimensions */
+    height: 100%;
+  }
+
   #ui {
     position: absolute;
     top: 0;
@@ -22,7 +35,7 @@ body {
     background-color: #333; /* Background for the health bar container */
     border-radius: 5px;
     border: 1px solid white;
-    z-index: 10;
+    
   }
   
   #playerHealthBar {
@@ -30,6 +43,8 @@ body {
     height: 100%;
     background-color: #4caf50; /* Green for health */
     border-radius: 5px;
+    font-weight: 700;
+    font-size: 20px;
     transition: width 0.3s ease; /* Smooth transition on updates */
   }
 
@@ -57,7 +72,7 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.8);
-    color: white;
+    color: rgb(255, 0, 0);
     flex-direction: column;
     justify-content: center;
     align-items: center;

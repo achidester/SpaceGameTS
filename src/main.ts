@@ -2,12 +2,14 @@ import * as THREE from 'three';
 import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'dat.gui';
 
+import { UI } from './ui'; 
 import { setupScene } from './sceneSetup';
 import { setupCamera } from './camera';
-import { setupUserControls, updateObjectPosition } from './userControls';
 import { Projectile } from './projectile';
-import { spawnEnemy, moveEnemy } from './enemy';
 import { createReticle } from './reticle';
+import { spawnEnemy, moveEnemy } from './enemy';
+import { setupUserControls, updateObjectPosition } from './userControls';
+
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
@@ -21,6 +23,7 @@ canvas.addEventListener('click', () => {
 const { scene, player } = setupScene();
 // Set up the camera and controls
 const { camera } = setupCamera(player.mesh.position);
+const ui = new UI(player.maxHealth);
 const reticle = createReticle(camera, scene);
 setupUserControls();
 
@@ -28,7 +31,6 @@ setupUserControls();
 const stats = new Stats();
 document.body.appendChild(stats.dom);
 
-console.log("Stats DOM:", stats.dom);
 const gui = new GUI();
 
 const cubeFolder = gui.addFolder("CUBE position");
@@ -149,5 +151,6 @@ function animate() {
 
   renderer.render(scene, camera);
   stats.update();
+  ui.drawHealthBar(player.health);
 }
 animate();

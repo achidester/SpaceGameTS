@@ -6,6 +6,9 @@ export class Player {
   fireRate: number; // Fire rate in milliseconds
   lastShotTime: number; // Track the last time a projectile was shot
   enemyTarget: THREE.Vector3; // Target for enemies to seek
+  maxHealth: number;
+  health: number;
+  healthBar: HTMLElement; // HTML health bar element
 
   constructor() {
     this.mesh = new THREE.Mesh(
@@ -16,6 +19,8 @@ export class Player {
     this.mesh.position.z = 5;
     this.fireRate = 100; // Fire rate set to 500 ms (0.5 seconds)
     this.lastShotTime = 0;
+    this.maxHealth = 100;
+    this.health = this.maxHealth;
 
     // Initialize enemyTarget position slightly behind the player
     this.enemyTarget = new THREE.Vector3(
@@ -23,6 +28,27 @@ export class Player {
       this.mesh.position.y,
       this.mesh.position.z - 5 // Adjust this distance as needed
     );
+
+    this.healthBar = document.getElementById('playerHealthBar')!;
+  }
+
+  updateHealthBar() {
+    if (this.healthBar) {
+      const healthPercentage = (this.health / this.maxHealth) * 100;
+      this.healthBar.style.width = `${healthPercentage}%`;
+    }
+  }
+
+
+  takeDamage(damage: number) {
+    this.health -= damage;
+    this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
+    this.updateHealthBar();
+
+    if (this.health <= 0) {
+      console.log("Player has died!");
+      // Handle death logic here
+    }
   }
 
   canShoot(): boolean {

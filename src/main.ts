@@ -3,7 +3,7 @@ import Stats from 'three/addons/libs/stats.module.js';
 import { GUI } from 'dat.gui';
 
 import { setupScene } from './sceneSetup';
-import { setupCamera } from './cameraControls';
+import { setupCamera } from './camera';
 import { setupUserControls, updateObjectPosition } from './userControls';
 import { Projectile } from './projectile';
 import { spawnEnemy, moveEnemy } from './enemy';
@@ -50,6 +50,7 @@ const spawnInterval = 2000;
 
 // Handle shooting
 window.addEventListener('mousedown', (event) => {
+  if (paused) return; 
   if (event.button === 0) { // Left mouse button
     const reticlePosition = reticle.getWorldPosition(new THREE.Vector3());
     const projectile = player.shoot(scene, reticlePosition);
@@ -97,7 +98,6 @@ function animate() {
   // Move each enemy toward the player and check for collisions
   enemies.forEach((enemy, enemyIndex) => {
     moveEnemy(enemy, player, scene, enemies);
-
     // Check for collisions with projectiles
     projectiles.forEach((projectile, projectileIndex) => {
       const distance = enemy.position.distanceTo(projectile.mesh.position);
@@ -105,16 +105,16 @@ function animate() {
         // Remove enemy and projectile on collision
         scene.remove(enemy);
         enemies.splice(enemyIndex, 1);
-
         scene.remove(projectile.mesh);
         projectiles.splice(projectileIndex, 1);
-      }
-    });
+    }
+  });
 
     // Optional: Remove the enemy if it gets too close to the player
     const distanceToPlayer = enemy.position.distanceTo(player.position);
     if (distanceToPlayer < 1) {
       // Handle collision or player damage here if needed
+      player.takeDamage(20);
       scene.remove(enemy);
       enemies.splice(enemyIndex, 1);
     }

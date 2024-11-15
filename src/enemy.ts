@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { scene } from './sceneSetup';
-import { player } from './sceneSetup'; // Import player to access position
-import { Player } from './player'; // Import player to access position
+import { scene, player } from './sceneSetup';
+import { Player } from './player'; // Just for typedef
 
 const enemySize = 1;
 const minSpawnDistance = 10;
@@ -49,7 +48,7 @@ export function moveEnemy(enemy: THREE.Mesh, player: Player, scene: THREE.Scene,
     direction.subVectors(player.enemyTarget, enemy.position).normalize();
   
     // Move the enemy in the direction of the target
-    enemy.position.add(direction.multiplyScalar(0.075));
+    enemy.position.add(direction.multiplyScalar(enemySpeed));
   
     // Check if the enemy has reached or passed the target’s Z position
     if (enemy.position.z <= player.enemyTarget.z) {

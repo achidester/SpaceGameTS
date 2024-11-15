@@ -34,7 +34,7 @@ export function updateObjectPosition(player: Player, camera: THREE.PerspectiveCa
   if (keyState.a) moveDirection.sub(right.multiplyScalar(horizontalMovementSpeed)); // Move left
   if (keyState.d) moveDirection.add(right.multiplyScalar(horizontalMovementSpeed)); // Move right
 
-  // Apply movement to the object
+  // Apply movement to the objecteed
   if (moveDirection.length() > 0) {
     player.mesh.position.add(moveDirection);
     player.mesh.rotation.y = Math.atan2(forward.x, forward.z);

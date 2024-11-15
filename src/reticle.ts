@@ -4,7 +4,7 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
   // Create reticle geometry and material
   const reticleGeometry = new THREE.SphereGeometry(1, 10, 10); // Adjust size as needed
   const reticleMaterial = new THREE.MeshBasicMaterial({
-    color: 0xd6d63e,
+    color: 0xd6d63e,    
     transparent: true,
     opacity: 0.3
   });

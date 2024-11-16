@@ -7,15 +7,14 @@ export class EnemyManager {
   private scene: THREE.Scene;
   private player: Player;
   private projectiles: Projectile[];
-  private enemies: THREE.Mesh[];
+  private enemies: THREE.Mesh[] = [];
   private enemySpawnTimer: number = 0; // Internal state
   private spawnInterval: number; // Configurable spawn interval
 
-  constructor(scene: THREE.Scene, player: Player, projectiles: Projectile[], enemies: THREE.Mesh[], spawnInterval: number = 2000) {
+  constructor(scene: THREE.Scene, player: Player, projectiles: Projectile[], spawnInterval: number = 2000) {
     this.scene = scene;
     this.player = player;
     this.projectiles = projectiles;
-    this.enemies = enemies;
     this.spawnInterval = spawnInterval;
   }
 
@@ -51,6 +50,11 @@ export class EnemyManager {
         this.enemies.splice(enemyIndex, 1);
       }
     });
+  }
+
+  //getter for enemies, may be uneeded
+  public getEnemies(): THREE.Mesh[] {
+    return this.enemies;
   }
 
   public update() {

@@ -45,8 +45,7 @@ cameraFolder.open()
 
 // Initialize projectiles and enemies
 const projectiles: Projectile[] = [];
-const enemies: THREE.Mesh[] = [];
-const enemyManager = new EnemyManager(scene, player, projectiles, enemies, 2000);
+const enemyManager = new EnemyManager(scene, player, projectiles,  2000);
 
 // Handle shooting
 window.addEventListener('mousedown', (event) => {
@@ -84,19 +83,17 @@ window.addEventListener('keydown', (event) => {
 function animate() {
   requestAnimationFrame(animate);
 
+  // Game is paused, skip the rest of the updates
   if (paused) {
-    // Game is paused, skip the rest of the updates
     document.exitPointerLock();
     return;
   }
+  // Player dead, stop game
   if (player.health <= 0) {
-    // Player dead, stop game
     document.exitPointerLock();
     return;
   }
   
-  
-
   // Update each projectile and check if it has exceeded its range
   projectiles.forEach((projectile, index) => {
     projectile.update();

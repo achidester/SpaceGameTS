@@ -7,8 +7,8 @@ import { setupScene } from './sceneSetup';
 import { setupCamera } from './camera';
 import { Projectile } from './projectile';
 import { createReticle } from './reticle';
-import { spawnEnemy, moveEnemy } from './enemy';
 import { setupUserControls, updateObjectPosition } from './userControls';
+import { EnemyManager } from './enemyManager';
 
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -27,17 +27,14 @@ const ui = new UI(player.maxHealth);
 const reticle = createReticle(camera, scene);
 setupUserControls();
 
-// Set up stats and GUI for debugging
+// Set up stats and GUI for debugging (DEV)
 const stats = new Stats();
 document.body.appendChild(stats.dom);
-
 const gui = new GUI();
-
 const cubeFolder = gui.addFolder("CUBE position");
 cubeFolder.add(player.mesh.position, "x", -5, 5);
 cubeFolder.add(player.mesh.position, "y", 0, 5);
 cubeFolder.add(player.mesh.position, "z", -5, 5);
-
 const cameraFolder = gui.addFolder("CAMERA controls");
 cameraFolder.add(camera.position, "x", -10, 10);
 cameraFolder.add(camera.position, "y", -10, 10);
@@ -49,8 +46,7 @@ cameraFolder.open()
 // Initialize projectiles and enemies
 const projectiles: Projectile[] = [];
 const enemies: THREE.Mesh[] = [];
-let enemySpawnTimer = 0;
-const spawnInterval = 2000;
+const enemyManager = new EnemyManager(scene, player, projectiles, enemies, 2000);
 
 // Handle shooting
 window.addEventListener('mousedown', (event) => {
@@ -99,38 +95,7 @@ function animate() {
     return;
   }
   
-  // Spawn enemies at intervals
-  if (Date.now() - enemySpawnTimer > spawnInterval) {
-    const enemy = spawnEnemy();
-    enemies.push(enemy);
-    enemySpawnTimer = Date.now();
-  }
-
-  // Move each enemy toward the player and check for collisions
-  enemies.forEach((enemy, enemyIndex) => {
-    moveEnemy(enemy, player, scene, enemies);
-    // Check for collisions with projectiles
-    projectiles.forEach((projectile, projectileIndex) => {
-      const distance = enemy.position.distanceTo(projectile.mesh.position);
-      if (distance < 1) { // Adjust collision distance as needed
-        // Remove enemy and projectile on collision
-        scene.remove(enemy);
-        enemies.splice(enemyIndex, 1);
-        scene.remove(projectile.mesh);
-        projectiles.splice(projectileIndex, 1);
-    }
-  });
-
-    // Optional: Remove the enemy if it gets too close to the player
-    const distanceToPlayer = enemy.position.distanceTo(player.position);
-    if (distanceToPlayer < 1) {
-      // Handle collision or player damage here if needed
-      player.takeDamage(50);
-      
-      scene.remove(enemy);
-      enemies.splice(enemyIndex, 1);
-    }
-  });
+  
 
   // Update each projectile and check if it has exceeded its range
   projectiles.forEach((projectile, index) => {
@@ -148,9 +113,12 @@ function animate() {
 
   // Make the player cube face the reticle
   player.mesh.lookAt(reticle.getWorldPosition(new THREE.Vector3()));
-
+  enemyManager.update();
   renderer.render(scene, camera);
   stats.update();
   ui.drawHealthBar(player.health);
 }
+
+
+
 animate();

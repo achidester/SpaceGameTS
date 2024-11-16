@@ -17,7 +17,7 @@ export class Player {
     );
     this.mesh.position.y = 0;
     this.mesh.position.z = 5;
-    this.fireRate = 100; // Fire rate set to 500 ms (0.5 seconds)
+    this.fireRate = 500; // Fire rate set to 100 ms (0.1 seconds)
     this.lastShotTime = 0;
     this.maxHealth = 100;
     this.health = this.maxHealth;
@@ -32,12 +32,6 @@ export class Player {
     this.healthBar = document.getElementById('playerHealthBar')!;
   }
 
-  updateHealthBar() {
-    if (this.healthBar) {
-      const healthPercentage = (this.health / this.maxHealth) * 100;
-      this.healthBar.style.width = `${healthPercentage}%`;
-    }
-  }
   showDeathScreen() {
     if (this.health > 0) return;
     const deathOverlay = document.getElementById("deathOverlay");
@@ -55,12 +49,10 @@ export class Player {
   takeDamage(damage: number) {
     this.health -= damage;
     this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
-    this.updateHealthBar();
 
     if (this.health <= 0) {
       console.log("Player has died!");
       this.showDeathScreen();
-      // Additional death logic, e.g., stopping the game
     }
   }
 

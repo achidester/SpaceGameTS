@@ -38,10 +38,11 @@ export class UI {
     drawHealthBar(currentHealth: number) {
       const barWidth = 200; // Width of the health bar
       const barHeight = 20; // Height of the health bar
-      const padding = 20; // Padding from the edges
+      const verticalPadding = 20; // Padding from the edges
+      const horizontalPadding = 50; // Padding from the edges
   
-      const x = this.uiCanvas.width - barWidth - padding; // Position from the right
-      const y = this.uiCanvas.height - barHeight - padding; // Position from the bottom
+      const x = this.uiCanvas.width - barWidth - horizontalPadding; // Position from the right
+      const y = this.uiCanvas.height - barHeight - verticalPadding ; // Position from the bottom
   
       const healthPercentage = currentHealth / this.playerMaxHealth;
   
@@ -67,4 +68,6 @@ export class UI {
         y + barHeight / 2
       );
     }
+
+    
   }

@@ -72,11 +72,11 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0, 0, 0, 0.8);
-    color: rgb(255, 0, 0);
+    color: #660505;
+    font-size: 250px;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-size: 2em;
     z-index: 15; /* Higher than other overlays */
   }
 

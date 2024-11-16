@@ -5,7 +5,7 @@ import { Player } from './player'; // Just for typedef
 const enemySize = 1;
 const minSpawnDistance = 10;
 const maxSpawnDistance = 20; // Define a max distance to control where enemies spawn
-const enemySpeed = .08; // Define a max distance to control where enemies spawn
+const enemySpeed = .2; // Define a max distance to control where enemies spawn
 
 // Function to spawn an enemy
 export function spawnEnemy() {

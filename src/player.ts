@@ -1,35 +1,44 @@
 import * as THREE from 'three';
 import { Projectile } from './projectile';
+import { ResourceManager } from './resourceManager';
 
 export class Player {
-  mesh: THREE.Mesh;
-  fireRate: number; // Fire rate in milliseconds
-  lastShotTime: number; // Track the last time a projectile was shot
-  enemyTarget: THREE.Vector3; // Target for enemies to seek
+  mesh: THREE.Object3D | null = null; // Mesh starts as null
+  fireRate: number;
+  lastShotTime: number;
+  enemyTarget: THREE.Vector3 | null = null; // Target starts as null
   maxHealth: number;
   health: number;
-  healthBar: HTMLElement; // HTML health bar element
+  healthBar: HTMLElement;
 
-  constructor() {
-    this.mesh = new THREE.Mesh(
-      new THREE.BoxGeometry(),
-      new THREE.MeshNormalMaterial({ wireframe: true })
-    );
-    this.mesh.position.y = 0;
-    this.mesh.position.z = 5;
-    this.fireRate = 500; // Fire rate set to 100 ms (0.1 seconds)
+  constructor(private resourceManager: ResourceManager) {
+    // Player properties
+    this.fireRate = 500;
     this.lastShotTime = 0;
     this.maxHealth = 100;
     this.health = this.maxHealth;
 
-    // Initialize enemyTarget position slightly behind the player
+    // HTML health bar
+    this.healthBar = document.getElementById('playerHealthBar')!;
+  }
+
+  async load(): Promise<void> {
+    // Load the model using ResourceManager
+    const model = await this.resourceManager.loadModel('/models/LOWPOLYSPACESHIP_v1.glb');
+    model.scale.set(0.25, 0.25, 0.25);
+    model.position.set(0, 0, 5); // Set initial position
+
+    // Assign the model to the mesh property
+    this.mesh = model;
+
+    // Initialize enemyTarget slightly behind the player after the mesh is set
     this.enemyTarget = new THREE.Vector3(
-      this.mesh.position.x,
-      this.mesh.position.y,
-      this.mesh.position.z - 5 // Adjust this distance as needed
+      model.position.x,
+      model.position.y,
+      model.position.z - 5
     );
 
-    this.healthBar = document.getElementById('playerHealthBar')!;
+    console.log('Player model loaded successfully');
   }
 
   showDeathScreen() {
@@ -46,6 +55,7 @@ export class Player {
       });
     }
   }
+
   takeDamage(damage: number) {
     this.health -= damage;
     this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
@@ -62,7 +72,7 @@ export class Player {
   }
 
   shoot(scene: THREE.Scene, target: THREE.Vector3): Projectile | null {
-    if (!this.canShoot()) return null;
+    if (!this.canShoot() || !this.mesh) return null; // Ensure mesh is ready
 
     const direction = new THREE.Vector3();
     direction.subVectors(target, this.mesh.position).normalize();
@@ -74,16 +84,17 @@ export class Player {
     return projectile;
   }
 
-  get position(): THREE.Vector3 {
-    return this.mesh.position;
+  get position(): THREE.Vector3 | null {
+    return this.mesh?.position || null;
   }
 
   updateEnemyTarget() {
-    // Keep enemyTarget slightly behind the player
-    this.enemyTarget.set(
-      this.mesh.position.x,
-      this.mesh.position.y,
-      this.mesh.position.z - 5 // Keep it offset on the Z-axis
-    );
+    if (this.mesh && this.enemyTarget) {
+      this.enemyTarget.set(
+        this.mesh.position.x,
+        this.mesh.position.y,
+        this.mesh.position.z - 5
+      );
+    }
   }
 }

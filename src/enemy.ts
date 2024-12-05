@@ -45,13 +45,13 @@ function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: num
 // Move the enemy toward the player
 export function moveEnemy(enemy: THREE.Mesh, player: Player, scene: THREE.Scene, enemies: THREE.Mesh[]) {
     const direction = new THREE.Vector3();
-    direction.subVectors(player.enemyTarget, enemy.position).normalize();
+    direction.subVectors(player.enemyTarget!, enemy.position).normalize();
   
     // Move the enemy in the direction of the target
     enemy.position.add(direction.multiplyScalar(enemySpeed));
   
     // Check if the enemy has reached or passed the target’s Z position
-    if (enemy.position.z <= player.enemyTarget.z) {
+    if (enemy.position.z <= player.enemyTarget!.z) {
       // Remove the enemy from the scene
       scene.remove(enemy);
   

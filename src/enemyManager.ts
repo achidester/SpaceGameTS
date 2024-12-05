@@ -45,7 +45,7 @@ export class EnemyManager {
       // Check for proximity to the player
       const distanceToPlayer = enemy.position.distanceTo(this.player.position!);
       if (distanceToPlayer < 1) {
-        this.player.takeDamage(0);
+        this.player.takeDamage(1);
         this.scene.remove(enemy);
         this.enemies.splice(enemyIndex, 1);
       }

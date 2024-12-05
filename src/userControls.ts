@@ -36,8 +36,8 @@ export function updateObjectPosition(player: Player, camera: THREE.PerspectiveCa
 
   // Apply movement to the objecteed
   if (moveDirection.length() > 0) {
-    player.mesh.position.add(moveDirection);
-    player.mesh.rotation.y = Math.atan2(forward.x, forward.z);
+    player.mesh!.position.add(moveDirection);
+    player.mesh!.rotation.y = Math.atan2(forward.x, forward.z);
 
     // Update enemy target to stay behind the player
     player.updateEnemyTarget();

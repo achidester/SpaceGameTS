@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { scene, player } from './sceneSetup';
+import { scene, player } from './setup/sceneSetup';
 import { Player } from './player'; // Just for typedef
 
 const enemySize = 1;

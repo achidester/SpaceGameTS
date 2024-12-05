@@ -3,35 +3,28 @@ import { Projectile } from './projectile';
 import { ResourceManager } from './resourceManager';
 
 export class Player {
-  mesh: THREE.Object3D | null = null; // Mesh starts as null
+  mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 
   fireRate: number;
   lastShotTime: number;
-  enemyTarget: THREE.Vector3 | null = null; // Target starts as null
+  enemyTarget: THREE.Vector3 | null = null; // Target starts as null (TODO: consider other options for enemy targeting system)
   maxHealth: number;
   health: number;
   healthBar: HTMLElement;
 
   constructor(private resourceManager: ResourceManager) {
-    // Player properties
     this.fireRate = 500;
     this.lastShotTime = 0;
     this.maxHealth = 100;
     this.health = this.maxHealth;
-
-    // HTML health bar
     this.healthBar = document.getElementById('playerHealthBar')!;
   }
 
   async load(): Promise<void> {
-    // Load the model using ResourceManager
     const model = await this.resourceManager.loadModel('/models/LOWPOLYSPACESHIP_v1.glb');
     model.scale.set(0.25, 0.25, 0.25);
-    model.position.set(0, 0, 5); // Set initial position
-
-    // Assign the model to the mesh property
+    model.position.set(0, 0, 5); // initial position
     this.mesh = model;
 
-    // Initialize enemyTarget slightly behind the player after the mesh is set
     this.enemyTarget = new THREE.Vector3(
       model.position.x,
       model.position.y,
@@ -59,7 +52,6 @@ export class Player {
   takeDamage(damage: number) {
     this.health -= damage;
     this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
-
     if (this.health <= 0) {
       console.log("Player has died!");
       this.showDeathScreen();
@@ -76,10 +68,8 @@ export class Player {
 
     const direction = new THREE.Vector3();
     direction.subVectors(target, this.mesh.position).normalize();
-
     const projectile = new Projectile(this.mesh.position, direction, 0.2);
     scene.add(projectile.mesh);
-
     this.lastShotTime = Date.now();
     return projectile;
   }
@@ -97,4 +87,5 @@ export class Player {
       );
     }
   }
+  
 }

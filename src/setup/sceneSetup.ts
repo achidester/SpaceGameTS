@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { Player } from './player';
-import { ResourceManager } from './resourceManager';
+import { Player } from '../player';
+import { ResourceManager } from '../resourceManager';
 
 export const scene = new THREE.Scene();
 const resourceManager = new ResourceManager();

@@ -1,0 +1,3 @@
+export { setupScene } from './sceneSetup';
+export { setupDevGUI } from './setupDevGUI';
+export { setupStats } from './setupStats';

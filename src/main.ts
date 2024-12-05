@@ -1,7 +1,7 @@
 // Core libraries
 import * as THREE from 'three';
 // Game setup and configuration
-import { setupScene } from './sceneSetup';
+import { setupScene, setupDevGUI, setupStats } from './setup';
 import { setupCamera } from './camera';
 // Game components
 import { Projectile } from './projectile';
@@ -13,9 +13,8 @@ import { Player } from './player';
 import { OverlayManager } from './overlay';
 import { initializeUI } from './initializeUI';
 import { UI } from './ui';
-// Stats (Development)
-import { setupStats } from './setupStats';
-import { setupDevGUI } from './setupDevGUI';
+
+
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
 const overlayManager = new OverlayManager();
@@ -117,7 +116,6 @@ function animate(
     stats.update();
     ui.drawHealthBar(player.health);
   }
-
   loop();
 }
 

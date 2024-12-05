@@ -1,4 +1,3 @@
-// overlay.ts
 export class OverlayManager {
     private paused: boolean = false;
     private gameInitialized: boolean = false;
@@ -10,25 +9,21 @@ export class OverlayManager {
       this.pauseOverlay = document.getElementById("pauseOverlay");
       this.loadingOverlay = document.getElementById("loadingOverlay");
   
-      // Initialize overlays' visibility
+      // Overlay visability
       if (this.pauseOverlay) this.pauseOverlay.style.display = "none";
       if (this.loadingOverlay) this.loadingOverlay.style.display = "flex";
     }
   
-    // Getter methods
     isPaused(): boolean {
       return this.paused;
     }
-  
     isGameInitialized(): boolean {
       return this.gameInitialized;
     }
   
-    // Methods to control overlays
     showPauseOverlay() {
       if (this.pauseOverlay) this.pauseOverlay.style.display = "flex";
     }
-  
     hidePauseOverlay() {
       if (this.pauseOverlay) this.pauseOverlay.style.display = "none";
     }
@@ -36,12 +31,10 @@ export class OverlayManager {
     showLoadingOverlay() {
       if (this.loadingOverlay) this.loadingOverlay.style.display = "flex";
     }
-  
     hideLoadingOverlay() {
       if (this.loadingOverlay) this.loadingOverlay.style.display = "none";
     }
   
-    // Methods to update game state
     togglePause() {
       this.paused = !this.paused;
       if (this.paused) {
@@ -51,7 +44,7 @@ export class OverlayManager {
         this.hidePauseOverlay();
       }
     }
-  
+    
     setGameInitialized(value: boolean) {
       this.gameInitialized = value;
       if (value) {
@@ -60,8 +53,7 @@ export class OverlayManager {
         this.showLoadingOverlay();
       }
     }
-  
-    // Error handling
+
     showError(message: string) {
       if (this.loadingOverlay) {
         this.loadingOverlay.innerHTML = `<p style="color: red;">${message}</p>`;

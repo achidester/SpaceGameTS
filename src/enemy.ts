@@ -14,7 +14,7 @@ export function spawnEnemy() {
     const enemy = new THREE.Mesh(geometry, material);
 
     // Use player position to spawn enemies near the screen center
-    const spawnPosition = spawnPositionNearCenter(player.position, minSpawnDistance, maxSpawnDistance);
+    const spawnPosition = spawnPositionNearCenter(player.position!, minSpawnDistance, maxSpawnDistance);
     enemy.position.set(spawnPosition.x, spawnPosition.y, spawnPosition.z);
 
     scene.add(enemy);

@@ -1,48 +1,21 @@
 // Core libraries
 import * as THREE from 'three';
 // Game setup and configuration
-import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI } from './setup';
-// Game components
+import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI, setupRenderer } from './setup';
 import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
-import { EnemyManager, OverlayManager } from './managers';
+import { EnemyManager, OverlayManager, CanvasManager } from './managers';
 import { Player, UI, Projectile } from './components';
 
 
-const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+// const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+
 const overlayManager = new OverlayManager();
-
-
-// TODO: Bounce to sep file
-function setupRenderer(canvas: HTMLCanvasElement): THREE.WebGLRenderer {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  return renderer;
-}
+const canvasManager = new CanvasManager(['gameCanvas']);
+canvasManager.enablePointerLock();
+canvasManager.enableAutoResize();
+const canvas = canvasManager.getCanvas('gameCanvas')
 const renderer = setupRenderer(canvas);
-// TODO: Bounce to sep file
-function enablePointerLock(canvas: HTMLCanvasElement) {
-  canvas.addEventListener('click', () => {
-    canvas.requestPointerLock();
-  });
-}
-enablePointerLock(canvas);
-
-// Game state variables
-let gameInitialized = false; // Tracks if initialization is complete
-
-// Arrays for projectiles
-const projectiles: Projectile[] = [];
-
-// TODO: Consider bouncing
-function initializeEnemyManager(
-  scene: THREE.Scene,
-  player: Player,
-  projectiles: Projectile[],
-  spawnInterval: number = 2000 // Default spawn interval
-): EnemyManager {
-  return new EnemyManager(scene, player, projectiles, spawnInterval);
-}
 
 // TODO: Consider bouncing
 function setupEventListeners(
@@ -68,7 +41,9 @@ function setupEventListeners(
 }
 
 
-// Animation Function
+let gameInitialized = false; 
+const projectiles: Projectile[] = [];
+
 function animate(
   renderer: THREE.WebGLRenderer,
   scene: THREE.Scene,
@@ -123,7 +98,7 @@ async function initializeGame() {
     setupDevGUI(camera);
     const reticle = createReticle(camera, scene);
     setupUserControls();
-    const enemyManager = initializeEnemyManager(scene, player, projectiles);
+    const enemyManager = new EnemyManager(scene, player, projectiles, 2000);
     setupEventListeners(player, scene, reticle);
 
     gameInitialized = true;

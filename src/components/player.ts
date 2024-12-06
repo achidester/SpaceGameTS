@@ -11,27 +11,18 @@ export class Player {
   health: number;
   healthBar: HTMLElement;
 
-  constructor(private resourceManager: ResourceManager) {
+  constructor(private playerModel: THREE.Object3D) {
+    this.mesh = this.playerModel
     this.fireRate = 500;
     this.lastShotTime = 0;
     this.maxHealth = 100;
     this.health = this.maxHealth;
     this.healthBar = document.getElementById('playerHealthBar')!;
-  }
-
-  async load(): Promise<void> {
-    const model = await this.resourceManager.loadModel('/models/LOWPOLYSPACESHIP_v1.glb');
-    model.scale.set(0.25, 0.25, 0.25);
-    model.position.set(0, 0, 5); // initial position
-    this.mesh = model;
-
     this.enemyTarget = new THREE.Vector3(
-      model.position.x,
-      model.position.y,
-      model.position.z - 5
+      this.mesh.position.x,
+      this.mesh.position.y,
+      this.mesh.position.z - 5
     );
-
-    console.log('Player model loaded successfully');
   }
 
   showDeathScreen() {

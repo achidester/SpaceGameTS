@@ -3,9 +3,11 @@ import * as THREE from 'three';
 import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI, setupRenderer } from './setup';
 import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
-import { EnemyManager, OverlayManager, CanvasManager } from './managers';
+import { EnemyManager, OverlayManager, CanvasManager, ResourceManager } from './managers';
 import { Player, UI, Projectile } from './components';
 import { setupEventListeners, setupInputListeners } from './input';
+import GameState from './gameState';
+import { PlayerFactory } from './setup/playerFactory';
 
 const overlayManager = new OverlayManager();
 const canvasManager = new CanvasManager(['gameCanvas']);
@@ -13,19 +15,13 @@ canvasManager.enablePointerLock();
 canvasManager.enableAutoResize();
 const canvas = canvasManager.getCanvas('gameCanvas')
 const renderer = setupRenderer(canvas);
+const resourceManager = new ResourceManager();
+const playerFactory = new PlayerFactory(resourceManager);
 
-const projectiles: Projectile[] = [];
 
-function animate(
-  renderer: THREE.WebGLRenderer,
-  scene: THREE.Scene,
-  camera: THREE.PerspectiveCamera,
-  player: Player,
-  reticle: THREE.Object3D,
-  enemyManager: EnemyManager,
-  stats: Stats,
-  ui: UI
-) {
+function animate() {
+  const gameState = GameState.getInstance();
+
   function loop() {
     requestAnimationFrame(loop);
 
@@ -34,49 +30,63 @@ function animate(
       return;
     }
 
-    if (player.health <= 0) {
+    if (gameState.player.health <= 0) {
       document.exitPointerLock();
       return;
     }
 
-    projectiles.forEach((projectile, index) => {
+    gameState.projectiles.forEach((projectile, index) => {
       projectile.update();
       if (projectile.hasExceededRange()) {
-        scene.remove(projectile.mesh);
-        projectiles.splice(index, 1);
+        gameState.scene.remove(projectile.mesh);
+        gameState.projectiles.splice(index, 1);
       }
     });
 
-    updateObjectPosition(player, camera);
-    player.mesh!.lookAt(reticle.getWorldPosition(new THREE.Vector3()));
-    enemyManager.update();
+    updateObjectPosition(gameState.player, gameState.camera);
+    gameState.player.mesh!.lookAt(gameState.reticle.getWorldPosition(new THREE.Vector3()));
+    gameState.enemyManager.update();
 
-    renderer.render(scene, camera);
-    stats.update();
-    ui.drawHealthBar(player.health);
+    renderer.render(gameState.scene, gameState.camera);
+    gameState.stats.update();
+    gameState.ui.drawHealthBar(gameState.player.health);
   }
   loop();
 }
 
 // Main Game Initialization Function
 async function initializeGame() {
+
+  const gameState = GameState.getInstance();
+
   try {
     console.log('Starting game initialization...');
-    const { scene, player } = await setupScene();
-    const { camera } = setupCamera(player.mesh!.position);
+    const { scene } = await setupScene();
+    const player = await playerFactory.createPlayer();
+    scene.add(player.mesh!); // Add player to the scene
+
+    const { camera } = setupCamera(new THREE.Vector3(0,0,5));
     const ui = setupGameUI(player.maxHealth);
     const stats = setupStats();
     setupDevGUI(camera);
     const reticle = createReticle(camera, scene);
     setupUserControls();
-    const enemyManager = new EnemyManager(scene, player, projectiles, 2000);
-    setupInputListeners(player, scene, reticle, projectiles, overlayManager);
+    const enemyManager = new EnemyManager(2000);
+    setupInputListeners(player, scene, reticle, gameState.projectiles, overlayManager);
     setupEventListeners();
+
+    gameState.renderer = renderer;
+    gameState.scene = scene;
+    gameState.camera = camera;
+    gameState.player = player;
+    gameState.reticle = reticle;
+    gameState.ui = ui;
+    gameState.stats = stats;
+    gameState.enemyManager = enemyManager
   
     overlayManager.setGameInitialized(true);
 
     console.log('Game initialization complete.');
-    return { renderer, scene, camera, player, reticle, enemyManager, stats, ui };
   } catch (error) {
     console.error('Error during game initialization:', error);
     overlayManager.showError('Failed to initialize the game. Please reload.');
@@ -85,8 +95,8 @@ async function initializeGame() {
 }
 
 // Start the Game
-initializeGame().then(({ renderer, scene, camera, player, reticle, enemyManager, stats, ui }) => {
-  animate(renderer, scene, camera, player, reticle, enemyManager, stats, ui);
+initializeGame().then(() => {
+  animate();
 }).catch((error) => {
   console.error('Failed to start the game:', error);
 });

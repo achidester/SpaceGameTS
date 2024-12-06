@@ -21,15 +21,10 @@ const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
 scene.add(ambientLight);
 
 // Create a directional light
-const directionalLight = new THREE.DirectionalLight(0xE1F8DC, .75); // White light with full intensity
-
-// Set the position of the light
+const directionalLight = new THREE.DirectionalLight(0xE1F8DC, .75);
 directionalLight.position.set(10, 10, 5); // (x, y, z)
 scene.add(directionalLight)
 
-
-export const player = new Player(resourceManager);
-scene.add(player.mesh!);
 
 
 const gridHelper = new THREE.GridHelper(200, 6); // Customize size and divisions as needed
@@ -41,8 +36,6 @@ gridHelper.position.set(0, 0, 0);
 export async function setupScene() {
   try {
     console.log("Starting asset loading...");
-    await player.load(); // Wait for the player model to load
-    scene.add(player.mesh!); // Add the player to the scene after loading
 
     console.log('All assets loaded. Scene is ready.');
 
@@ -57,6 +50,6 @@ export async function setupScene() {
     }
   }
 
-  return { scene, player };
+  return { scene };
 }
 

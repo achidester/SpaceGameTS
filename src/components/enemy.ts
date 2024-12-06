@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { scene, player } from '../setup/sceneSetup';
-import { Player } from './player'; // Just for typedef
+import { Player } from './player';
 
 const enemySize = 1;
 const minSpawnDistance = 10;
@@ -8,20 +7,20 @@ const maxSpawnDistance = 20; // Define a max distance to control where enemies s
 const enemySpeed = .2; // Define a max distance to control where enemies spawn
 
 // Function to spawn an enemy
-export function spawnEnemy() {
+export function spawnEnemy(playerPosition: THREE.Vector3, scene: THREE.Scene): THREE.Mesh {
     const geometry = new THREE.BoxGeometry(enemySize, enemySize, enemySize);
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const enemy = new THREE.Mesh(geometry, material);
 
     // Use player position to spawn enemies near the screen center
-    const spawnPosition = spawnPositionNearCenter(player.position!, minSpawnDistance, maxSpawnDistance);
+    const spawnPosition = spawnPositionNearCenter(playerPosition, minSpawnDistance, maxSpawnDistance);
     enemy.position.set(spawnPosition.x, spawnPosition.y, spawnPosition.z);
 
     scene.add(enemy);
     return enemy;
 }
 
-function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: number, maxDistance: number) {
+function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: number, maxDistance: number): THREE.Vector3 {
     // Define a forward direction in world space (e.g., along the negative z-axis)
     const forward = new THREE.Vector3(0, 0, 3);
 
@@ -43,7 +42,7 @@ function spawnPositionNearCenter(playerPosition: THREE.Vector3, minDistance: num
 }
 
 // Move the enemy toward the player
-export function moveEnemy(enemy: THREE.Mesh, player: Player, scene: THREE.Scene, enemies: THREE.Mesh[]) {
+export function moveEnemy(enemy: THREE.Mesh, player: Player, scene: THREE.Scene, enemies: THREE.Mesh[]): void {
     const direction = new THREE.Vector3();
     direction.subVectors(player.enemyTarget!, enemy.position).normalize();
   

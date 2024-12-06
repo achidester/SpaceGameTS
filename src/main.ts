@@ -8,9 +8,6 @@ import { EnemyManager, OverlayManager, CanvasManager } from './managers';
 import { Player, UI, Projectile } from './components';
 import { setupEventListeners, setupInputListeners } from './input';
 
-
-// const canvas = document.getElementById('canvas') as HTMLCanvasElement;
-
 const overlayManager = new OverlayManager();
 const canvasManager = new CanvasManager(['gameCanvas']);
 canvasManager.enablePointerLock();
@@ -19,7 +16,7 @@ const canvas = canvasManager.getCanvas('gameCanvas')
 const renderer = setupRenderer(canvas);
 
 
-let gameInitialized = false; 
+
 const projectiles: Projectile[] = [];
 
 function animate(
@@ -29,14 +26,13 @@ function animate(
   player: Player,
   reticle: THREE.Object3D,
   enemyManager: EnemyManager,
-  projectiles: Projectile[],
   stats: Stats,
   ui: UI
 ) {
   function loop() {
     requestAnimationFrame(loop);
 
-    if (!gameInitialized || overlayManager.isPaused()) {
+    if (!overlayManager.isGameInitialized() || overlayManager.isPaused()) {
       if (overlayManager.isPaused()) document.exitPointerLock();
       return;
     }
@@ -79,13 +75,11 @@ async function initializeGame() {
     const enemyManager = new EnemyManager(scene, player, projectiles, 2000);
     setupInputListeners(player, scene, reticle, projectiles, overlayManager);
     setupEventListeners();
-    
-
-    gameInitialized = true;
-    overlayManager.setGameInitialized(gameInitialized);
+  
+    overlayManager.setGameInitialized(true);
 
     console.log('Game initialization complete.');
-    return { renderer, scene, camera, player, reticle, enemyManager, projectiles, stats, ui };
+    return { renderer, scene, camera, player, reticle, enemyManager, stats, ui };
   } catch (error) {
     console.error('Error during game initialization:', error);
     overlayManager.showError('Failed to initialize the game. Please reload.');
@@ -94,8 +88,8 @@ async function initializeGame() {
 }
 
 // Start the Game
-initializeGame().then(({ renderer, scene, camera, player, reticle, enemyManager, projectiles, stats, ui }) => {
-  animate(renderer, scene, camera, player, reticle, enemyManager, projectiles, stats, ui);
+initializeGame().then(({ renderer, scene, camera, player, reticle, enemyManager, stats, ui }) => {
+  animate(renderer, scene, camera, player, reticle, enemyManager, stats, ui);
 }).catch((error) => {
   console.error('Failed to start the game:', error);
 });

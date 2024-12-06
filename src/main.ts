@@ -1,6 +1,5 @@
-// Core libraries
 import * as THREE from 'three';
-// Game setup and configuration
+
 import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI, setupRenderer } from './setup';
 import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
@@ -14,8 +13,6 @@ canvasManager.enablePointerLock();
 canvasManager.enableAutoResize();
 const canvas = canvasManager.getCanvas('gameCanvas')
 const renderer = setupRenderer(canvas);
-
-
 
 const projectiles: Projectile[] = [];
 

@@ -6,6 +6,7 @@ import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
 import { EnemyManager, OverlayManager, CanvasManager } from './managers';
 import { Player, UI, Projectile } from './components';
+import { setupEventListeners, setupInputListeners } from './input';
 
 
 // const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -16,29 +17,6 @@ canvasManager.enablePointerLock();
 canvasManager.enableAutoResize();
 const canvas = canvasManager.getCanvas('gameCanvas')
 const renderer = setupRenderer(canvas);
-
-// TODO: Consider bouncing
-function setupEventListeners(
-  player: Player,
-  scene: THREE.Scene,
-  reticle: THREE.Object3D,
-) {
-  // Handle shooting
-  window.addEventListener("mousedown", (event) => {
-    if (overlayManager.isPaused() || !overlayManager.isGameInitialized()) return;
-    if (event.button === 0) {
-      const reticlePosition = reticle.getWorldPosition(new THREE.Vector3());
-      const projectile = player.shoot(scene, reticlePosition);
-      if (projectile) projectiles.push(projectile);
-    }
-  });
-  // Pause handling
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "Tab" && overlayManager.isGameInitialized()) {
-      overlayManager.togglePause();
-    }
-  });
-}
 
 
 let gameInitialized = false; 
@@ -99,7 +77,9 @@ async function initializeGame() {
     const reticle = createReticle(camera, scene);
     setupUserControls();
     const enemyManager = new EnemyManager(scene, player, projectiles, 2000);
-    setupEventListeners(player, scene, reticle);
+    setupInputListeners(player, scene, reticle, projectiles, overlayManager);
+    setupEventListeners();
+    
 
     gameInitialized = true;
     overlayManager.setGameInitialized(gameInitialized);

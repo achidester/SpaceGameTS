@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { Projectile } from './projectile';
-import { spawnEnemy, moveEnemy } from './components/enemy';
-import { Player } from './player';
+import { Projectile } from '../components/projectile';
+import { spawnEnemy, moveEnemy } from '../components/enemy';
+import { Player } from '../components/player';
 
 export class EnemyManager {
   private scene: THREE.Scene;

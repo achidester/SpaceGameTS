@@ -1,19 +1,12 @@
 // Core libraries
 import * as THREE from 'three';
 // Game setup and configuration
-import { setupScene, setupDevGUI, setupStats } from './setup';
-import { setupCamera } from './camera';
+import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI } from './setup';
 // Game components
-import { Projectile } from './projectile';
 import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
-import { EnemyManager } from './enemyManager';
-import { Player } from './player';
-// UI 
-import { OverlayManager } from './overlay';
-import { initializeUI } from './initializeUI';
-import { UI } from './ui';
-
+import { EnemyManager, OverlayManager } from './managers';
+import { Player, UI, Projectile } from './components';
 
 
 const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -125,7 +118,7 @@ async function initializeGame() {
     console.log('Starting game initialization...');
     const { scene, player } = await setupScene();
     const { camera } = setupCamera(player.mesh!.position);
-    const ui = initializeUI(player.maxHealth);
+    const ui = setupGameUI(player.maxHealth);
     const stats = setupStats();
     setupDevGUI(camera);
     const reticle = createReticle(camera, scene);

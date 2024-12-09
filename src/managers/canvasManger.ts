@@ -43,19 +43,6 @@ export class CanvasManager {
         canvas.addEventListener('click', () => {
             canvas.requestPointerLock();
         });
-        });
-
-        // Listen for pointer lock changes
-        document.addEventListener('pointerlockchange', () => {
-        const lockedCanvas = Array.from(this.canvases.values()).find(
-            (canvas) => document.pointerLockElement === canvas
-        );
-
-        if (lockedCanvas) {
-            console.log(`Pointer locked on canvas: ${lockedCanvas.id}`);
-        } else {
-            console.log('Pointer unlocked');
-        }
-        });
+      });
     }
   }

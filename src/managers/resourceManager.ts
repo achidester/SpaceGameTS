@@ -1,4 +1,5 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'; //linter is wrong, this is fine
+// @ts-ignore // ignores next line type error.
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import * as THREE from 'three';
 
 export class ResourceManager {
@@ -9,18 +10,18 @@ export class ResourceManager {
   constructor() {
     this.gltfLoader = new GLTFLoader();
     this.textureLoader = new THREE.TextureLoader();
-    this.loadingPromises = [];
+    this.loadingPromises = [];  
   }
 
   loadModel(url: string): Promise<THREE.Object3D> {
     const promise = new Promise<THREE.Object3D>((resolve, reject) => {
       this.gltfLoader.load(
         url,
-        (gltf) => {
+        (gltf: GLTFLoader) => {
           resolve(gltf.scene);
         },
         undefined, // Optional progress callback
-        (error) => {
+        (error: ErrorEvent) => {
           console.error(`Error loading model from ${url}:`, error);
           reject(error);
         }

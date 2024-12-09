@@ -25,10 +25,20 @@ export class Projectile {
     // Move the projectile according to its velocity
     this.mesh.position.add(this.velocity);
   }
-  
+
   hasExceededRange(customMaxRange?: number): boolean {
     const range = customMaxRange ?? this.maxRange;
     const distance = this.mesh.position.distanceTo(this.startPosition);
     return distance > range;
+  }
+
+  destroy(): void {
+    // Dispose of geometry and material resources
+    if (this.mesh.geometry instanceof THREE.BufferGeometry) {
+      this.mesh.geometry.dispose();
+    }
+    if (this.mesh.material instanceof THREE.Material) {
+      this.mesh.material.dispose();
+    }
   }
 }

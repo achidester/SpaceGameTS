@@ -1,9 +1,5 @@
 import * as THREE from 'three';
-import { Player } from '../components';
-import { ResourceManager } from '../managers/resourceManager';
-
 export const scene = new THREE.Scene();
-const resourceManager = new ResourceManager();
 
 const image = new Image();
 image.src = 'space123.jpg';

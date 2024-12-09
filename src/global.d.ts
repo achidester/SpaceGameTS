@@ -1,3 +1,4 @@
+import * as THREE from 'three'; // for typedef
 
 declare module 'three/examples/jsm/loaders/GLTFLoader' {
   import { Loader } from 'three';

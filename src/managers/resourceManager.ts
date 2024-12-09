@@ -1,4 +1,4 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'; //linter is wrong, this is fine
 import * as THREE from 'three';
 
 export class ResourceManager {

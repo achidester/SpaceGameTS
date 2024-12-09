@@ -1,4 +1,3 @@
-// projectile.ts
 import * as THREE from 'three';
 
 export class Projectile {

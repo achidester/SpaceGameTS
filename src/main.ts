@@ -4,7 +4,6 @@ import { setupScene, setupDevGUI, setupStats, setupCamera, setupGameUI, setupRen
 import { createReticle } from './reticle';
 import { setupUserControls, updateObjectPosition } from './userControls';
 import { EnemyManager, OverlayManager, CanvasManager, ResourceManager } from './managers';
-import { Player, UI, Projectile } from './components';
 import { setupEventListeners, setupInputListeners } from './input';
 import GameState from './gameState';
 import { PlayerFactory } from './setup/playerFactory';

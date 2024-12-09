@@ -1,7 +1,5 @@
 import * as THREE from 'three';
-import { Projectile } from '../components/projectile';
 import { spawnEnemy, moveEnemy } from '../components/enemy';
-import { Player } from '../components/player';
 import GameState from '../gameState';
 
 export class EnemyManager {

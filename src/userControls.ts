@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Player } from './player'; 
+import { Player } from './components/player'; 
 
 const verticalMovementSpeed = 0.05; // Speed for W and S keys
 const horizontalMovementSpeed = 0.05; // Separate speed for A and D keys

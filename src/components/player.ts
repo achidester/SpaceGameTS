@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { Projectile } from './projectile';
-import { ResourceManager } from '../managers/resourceManager';
 
 export class Player {
   mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 

@@ -54,21 +54,18 @@ function animate() {
 
 // Main Game Initialization Function
 async function initializeGame() {
-
   const gameState = GameState.getInstance();
-
   try {
     console.log('Starting game initialization...');
     const { scene } = await setupScene();
     const player = await playerFactory.createPlayer();
-    scene.add(player.mesh!);
-
     const { camera } = setupCamera(new THREE.Vector3(0,0,5));
     const ui = setupGameUI(player.maxHealth);
     const stats = setupStats();
-    setupDevGUI(camera);
     const reticle = createReticle(camera, scene);
     const enemyManager = new EnemyManager(2000);
+    scene.add(player.mesh!);
+    setupDevGUI(camera);
     setupInputListeners();
     setupEventListeners();
 
@@ -80,7 +77,6 @@ async function initializeGame() {
     gameState.ui = ui;
     gameState.stats = stats;
     gameState.enemyManager = enemyManager
-  
     gameState.setGameInitialized(true);
 
     console.log('Game initialization complete.');

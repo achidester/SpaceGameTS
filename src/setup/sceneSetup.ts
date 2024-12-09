@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 export const scene = new THREE.Scene();
 
-const image = new Image();
-image.src = 'space123.jpg';
-image.onload = () => {
+const backgroundImg = new Image();
+backgroundImg.src = 'space123.jpg';
+backgroundImg.onload = () => {
   // Create a texture from the image
-  const texture = new THREE.Texture(image);
+  const texture = new THREE.Texture(backgroundImg);
   texture.needsUpdate = true; // Mark texture as needing an update
 
   // Set the scene background to the texture

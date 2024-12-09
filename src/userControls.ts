@@ -6,8 +6,8 @@ const verticalMovementSpeed = 0.05;
 const horizontalMovementSpeed = 0.05;
 
 const boundaries = {
-  xMin: -5, 
-  xMax: 5,  
+  xMin: -4.75, 
+  xMax: 4.75,  
   yMin: -2,  
   yMax: 2, 
 };

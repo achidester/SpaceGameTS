@@ -41,9 +41,11 @@ function animate() {
       }
     });
 
+    const elapsedPlayTime = gameState.getPlayTime(); // Get total playtime
+
     updateObjectPosition(gameState.player, gameState.camera);
     gameState.player.mesh!.lookAt(gameState.reticle.getWorldPosition(new THREE.Vector3()));
-    gameState.enemyManager.update();
+    gameState.enemyManager.update(elapsedPlayTime);
 
     renderer.render(gameState.scene, gameState.camera);
     gameState.stats.update();

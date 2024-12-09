@@ -16,9 +16,15 @@ export function handleShooting(event: MouseEvent) {
 export function handleKeyDown(event: KeyboardEvent) {
   const keyActions: { [key: string]: () => void } = {
     Tab: () => {
-      const overlayManager = OverlayManager.getInstance(); // Assuming OverlayManager can be accessed globally
+      const overlayManager = OverlayManager.getInstance();
       if (gameState.isGameInitialized()) {
-        overlayManager.togglePause();
+        if (gameState.isPaused()) {
+          gameState.resumeTimer(); // Resume playtime when unpausing
+          overlayManager.hidePauseOverlay();
+        } else {
+          gameState.stopTimer(); // Stop playtime when pausing
+          overlayManager.showPauseOverlay();
+        }
       }
     },
     // Add other keys with specific actions here:

@@ -15,6 +15,8 @@ class GameState {
   ui!: UI;
   projectiles: Projectile[] = [];
 
+  private playTime: number = 0; // Total playtime in milliseconds
+  private lastResumeTime: number = 0; // Timestamp of when the game was last resumed
   private gameInitialized: boolean = false;
   private paused: boolean = false;
 
@@ -34,6 +36,25 @@ class GameState {
   public setGameInitialized(value: boolean): void {
     this.gameInitialized = value;
     OverlayManager.getInstance().updateLoadingOverlay(!value);
+  }
+
+  public stopTimer(): void {
+    if (!this.paused) {
+      this.paused = true;
+      this.playTime += Date.now() - this.lastResumeTime; // Accumulate playtime
+    }
+  }
+  public resumeTimer(): void {
+    if (this.paused) {
+      this.paused = false;
+      this.lastResumeTime = Date.now();
+    }
+  }
+  public getPlayTime(): number {
+    if (this.paused) {
+      return this.playTime; // Return accumulated playtime when paused
+    }
+    return this.playTime + (Date.now() - this.lastResumeTime); // Include time since last resume
   }
 
   public isPaused(): boolean {

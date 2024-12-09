@@ -9,15 +9,15 @@ export class EnemyManager {
   private enemySpawnTimer: number = 0;
   private spawnInterval: number;
 
-  constructor(spawnInterval: number = 2000) {
+  constructor(spawnInterval: number = 500) {
     this.spawnInterval = spawnInterval;
   }
 
   private getSpawnPosition(playerPosition: THREE.Vector3): THREE.Vector3 {
     const forward = new THREE.Vector3(0, 0, 3);
     const distance = Math.random() * (MAX_SPAWN_DISTANCE - MIN_SPAWN_DISTANCE) + MIN_SPAWN_DISTANCE;
-    const offsetX = (Math.random() - 0.5) * 10;
-    const offsetY = (Math.random() - 0.5) * 5;
+    const offsetX = (Math.random() - 0.5) * 20;
+    const offsetY = (Math.random() - 0.5) * 15;
 
     return new THREE.Vector3(
       playerPosition.x + forward.x * distance + offsetX,
@@ -62,8 +62,7 @@ export class EnemyManager {
     });
   }
 
-  public update(): void {
-    // Handle spawning
+  public update(playTime: number): void {
     if (Date.now() - this.enemySpawnTimer > this.spawnInterval) {
       this.spawnEnemy();
       this.enemySpawnTimer = Date.now();
@@ -71,26 +70,26 @@ export class EnemyManager {
 
     // Move enemies and check collisions
     this.enemies.forEach((enemy, index) => {
-      const player = this.gameState.player;
-      const direction = new THREE.Vector3();
-      direction.subVectors(player.enemyTarget!, enemy.position).normalize();
+        const player = this.gameState.player;
+        const direction = new THREE.Vector3();
+        direction.subVectors(player.enemyTarget!, enemy.position).normalize();
 
-      enemy.position.add(direction.multiplyScalar(ENEMY_SPEED));
+        enemy.position.add(direction.multiplyScalar(ENEMY_SPEED));
 
-      if (enemy.position.z <= player.enemyTarget!.z) {
-        this.removeEnemy(enemy, index);
-      }
+        if (enemy.position.z <= player.enemyTarget!.z) {
+            this.removeEnemy(enemy, index);
+        }
 
-      const distanceToPlayer = enemy.position.distanceTo(player.position!);
-      if (distanceToPlayer < 1) {
-        player.takeDamage(25);
-        this.removeEnemy(enemy, index);
-      }
+        const distanceToPlayer = enemy.position.distanceTo(player.position!);
+        if (distanceToPlayer < 1) {
+            player.takeDamage(25);
+            this.removeEnemy(enemy, index);
+        }
     });
 
     // Check for collisions
     this.checkCollisions();
-  }
+}
 
   public getEnemies(): THREE.Mesh[] {
     return this.enemies;

@@ -2,8 +2,8 @@ import * as THREE from 'three';
 
 export const ENEMY_SIZE = 1;
 export const ENEMY_SPEED = 0.2;
-export const MIN_SPAWN_DISTANCE = 10;
-export const MAX_SPAWN_DISTANCE = 20;
+export const MIN_SPAWN_DISTANCE = 15;
+export const MAX_SPAWN_DISTANCE = 25;
 
 // Create the geometry and material for enemies
 export function createEnemyMesh(): THREE.Mesh {

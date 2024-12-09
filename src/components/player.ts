@@ -15,7 +15,7 @@ export class Player {
 
   constructor(private playerModel: THREE.Object3D) {
     this.mesh = this.playerModel
-    this.fireRate = 500;
+    this.fireRate = 50;
     this.lastShotTime = 0;
     this.maxHealth = 100;
     this.health = this.maxHealth;

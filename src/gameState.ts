@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Player, Projectile, UI } from './components';
-import { EnemyManager } from './managers';
+import { EnemyManager, OverlayManager } from './managers';
 
 class GameState {
   private static instance: GameState;
@@ -15,6 +15,9 @@ class GameState {
   ui!: UI;
   projectiles: Projectile[] = [];
 
+  private gameInitialized: boolean = false;
+  private paused: boolean = false;
+
   private constructor() {}
 
   public static getInstance(): GameState {
@@ -23,6 +26,27 @@ class GameState {
     }
     return GameState.instance;
   }
+
+  public isGameInitialized(): boolean {
+    return this.gameInitialized;
+  }
+
+  public setGameInitialized(value: boolean): void {
+    this.gameInitialized = value;
+    OverlayManager.getInstance().updateLoadingOverlay(!value);
+  }
+
+  public isPaused(): boolean {
+    return this.paused;
+  }
+  public setPaused(value: boolean): void {
+    this.paused = value;
+  }
+
+  public get isLoading(): boolean {
+    return !this.gameInitialized;
+  }
+
 
 //   public reset() {
 //     this.projectiles = [];

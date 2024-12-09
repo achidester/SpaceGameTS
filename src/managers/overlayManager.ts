@@ -1,7 +1,7 @@
+import GameState from "../gameState";
+
 export class OverlayManager {
-    private paused: boolean = false;
-    private gameInitialized: boolean = false;
-  
+    private static instance: OverlayManager | null = null;
     private pauseOverlay: HTMLElement | null;
     private loadingOverlay: HTMLElement | null;
   
@@ -13,14 +13,20 @@ export class OverlayManager {
       if (this.pauseOverlay) this.pauseOverlay.style.display = "none";
       if (this.loadingOverlay) this.loadingOverlay.style.display = "flex";
     }
-  
-    isPaused(): boolean {
-      return this.paused;
+
+    public static getInstance(): OverlayManager {
+      if (!OverlayManager.instance) {
+        OverlayManager.instance = new OverlayManager();
+      }
+      return OverlayManager.instance;
     }
-    isGameInitialized(): boolean {
-      return this.gameInitialized;
+
+    public updateLoadingOverlay(isLoading: boolean): void {
+      if (this.loadingOverlay) {
+        this.loadingOverlay.style.display = isLoading ? "flex" : "none";
+      }
     }
-  
+
     showPauseOverlay() {
       if (this.pauseOverlay) this.pauseOverlay.style.display = "flex";
     }
@@ -28,29 +34,16 @@ export class OverlayManager {
       if (this.pauseOverlay) this.pauseOverlay.style.display = "none";
     }
   
-    showLoadingOverlay() {
-      if (this.loadingOverlay) this.loadingOverlay.style.display = "flex";
-    }
-    hideLoadingOverlay() {
-      if (this.loadingOverlay) this.loadingOverlay.style.display = "none";
-    }
-  
     togglePause() {
-      this.paused = !this.paused;
-      if (this.paused) {
+      const gameState = GameState.getInstance();
+      const isPaused = !gameState.isPaused();
+      gameState.setPaused(isPaused);
+  
+      if (isPaused) {
         this.showPauseOverlay();
         document.exitPointerLock();
       } else {
         this.hidePauseOverlay();
-      }
-    }
-    
-    setGameInitialized(value: boolean) {
-      this.gameInitialized = value;
-      if (value) {
-        this.hideLoadingOverlay();
-      } else {
-        this.showLoadingOverlay();
       }
     }
 

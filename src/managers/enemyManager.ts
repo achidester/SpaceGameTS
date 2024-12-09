@@ -1,58 +1,98 @@
 import * as THREE from 'three';
-import { spawnEnemy, moveEnemy } from '../components/enemy';
+import { createEnemyMesh, ENEMY_SPEED, MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE } from '../components/enemy';
 import GameState from '../gameState';
+import { Projectile } from '../components';
 
 export class EnemyManager {
   private gameState = GameState.getInstance();
   private enemies: THREE.Mesh[] = [];
-  private enemySpawnTimer: number = 0; // Internal state
-  private spawnInterval: number; // Configurable spawn interval
+  private enemySpawnTimer: number = 0;
+  private spawnInterval: number;
 
   constructor(spawnInterval: number = 2000) {
     this.spawnInterval = spawnInterval;
   }
 
-  private spawnEnemies() {
-    if (Date.now() - this.enemySpawnTimer > this.spawnInterval) {
-      const enemy = spawnEnemy(this.gameState.player.position!, this.gameState.scene );
-      this.enemies.push(enemy);
-      this.enemySpawnTimer = Date.now(); // Update spawn timer
-    }
+  private getSpawnPosition(playerPosition: THREE.Vector3): THREE.Vector3 {
+    const forward = new THREE.Vector3(0, 0, 3);
+    const distance = Math.random() * (MAX_SPAWN_DISTANCE - MIN_SPAWN_DISTANCE) + MIN_SPAWN_DISTANCE;
+    const offsetX = (Math.random() - 0.5) * 10;
+    const offsetY = (Math.random() - 0.5) * 5;
+
+    return new THREE.Vector3(
+      playerPosition.x + forward.x * distance + offsetX,
+      playerPosition.y + offsetY,
+      playerPosition.z + forward.z * distance
+    );
   }
 
-  private moveEnemies() {
-    this.enemies.forEach((enemy, enemyIndex) => {
-      moveEnemy(enemy, this.gameState.player, this.gameState.scene, this.enemies);
+  private spawnEnemy(): void {
+    const playerPosition = this.gameState.player.position!;
+    const spawnPosition = this.getSpawnPosition(playerPosition);
 
-      // Check for collisions with projectiles
+    const enemy = createEnemyMesh();
+    enemy.position.copy(spawnPosition);
+
+    this.gameState.scene.add(enemy);
+    this.enemies.push(enemy);
+  }
+
+  private removeEnemy(enemy: THREE.Mesh, index: number): void {
+    this.gameState.scene.remove(enemy);
+    this.enemies.splice(index, 1);
+  }
+
+  private removeProjectile(projectile: Projectile, index: number): void {
+    this.gameState.scene.remove(projectile.mesh);
+    projectile.destroy();
+    this.gameState.projectiles.splice(index, 1);
+  }
+
+  private checkCollisions(): void {
+    this.enemies.forEach((enemy, enemyIndex) => {
       this.gameState.projectiles.forEach((projectile, projectileIndex) => {
         const distance = enemy.position.distanceTo(projectile.mesh.position);
+
         if (distance < 1) {
-          // Remove enemy and projectile on collision
-          this.gameState.scene.remove(enemy);
-          this.enemies.splice(enemyIndex, 1);
-          this.gameState.scene.remove(projectile.mesh);
-          this.gameState.projectiles.splice(projectileIndex, 1);
+          // Collision detected
+          this.removeEnemy(enemy, enemyIndex);
+          this.removeProjectile(projectile, projectileIndex);
         }
       });
-
-      // Check for proximity to the player
-      const distanceToPlayer = enemy.position.distanceTo(this.gameState.player.position!);
-      if (distanceToPlayer < 1) {
-        this.gameState.player.takeDamage(25);
-        this.gameState.scene.remove(enemy);
-        this.enemies.splice(enemyIndex, 1);
-      }
     });
   }
 
-  //getter for enemies, may be uneeded
-  public getEnemies(): THREE.Mesh[] {
-    return this.enemies;
+  public update(): void {
+    // Handle spawning
+    if (Date.now() - this.enemySpawnTimer > this.spawnInterval) {
+      this.spawnEnemy();
+      this.enemySpawnTimer = Date.now();
+    }
+
+    // Move enemies and check collisions
+    this.enemies.forEach((enemy, index) => {
+      const player = this.gameState.player;
+      const direction = new THREE.Vector3();
+      direction.subVectors(player.enemyTarget!, enemy.position).normalize();
+
+      enemy.position.add(direction.multiplyScalar(ENEMY_SPEED));
+
+      if (enemy.position.z <= player.enemyTarget!.z) {
+        this.removeEnemy(enemy, index);
+      }
+
+      const distanceToPlayer = enemy.position.distanceTo(player.position!);
+      if (distanceToPlayer < 1) {
+        player.takeDamage(25);
+        this.removeEnemy(enemy, index);
+      }
+    });
+
+    // Check for collisions
+    this.checkCollisions();
   }
 
-  public update() {
-    this.spawnEnemies();
-    this.moveEnemies();
+  public getEnemies(): THREE.Mesh[] {
+    return this.enemies;
   }
 }

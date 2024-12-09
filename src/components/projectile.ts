@@ -25,10 +25,10 @@ export class Projectile {
     // Move the projectile according to its velocity
     this.mesh.position.add(this.velocity);
   }
-
-  hasExceededRange(): boolean {
-    // Calculate distance from the start position
+  
+  hasExceededRange(customMaxRange?: number): boolean {
+    const range = customMaxRange ?? this.maxRange;
     const distance = this.mesh.position.distanceTo(this.startPosition);
-    return distance > this.maxRange;
+    return distance > range;
   }
 }

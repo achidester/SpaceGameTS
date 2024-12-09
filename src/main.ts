@@ -64,6 +64,7 @@ async function initializeGame() {
     const stats = setupStats();
     const reticle = createReticle(camera, scene);
     const enemyManager = new EnemyManager(2000);
+
     scene.add(player.mesh!);
     setupDevGUI(camera);
     setupInputListeners();
@@ -78,7 +79,6 @@ async function initializeGame() {
     gameState.stats = stats;
     gameState.enemyManager = enemyManager
     gameState.setGameInitialized(true);
-
     console.log('Game initialization complete.');
   } catch (error) {
     console.error('Error during game initialization:', error);

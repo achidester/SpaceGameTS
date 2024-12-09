@@ -6,13 +6,12 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
   const spriteMaterial = new THREE.SpriteMaterial({
     map: reticleTexture,
     transparent: true,
-    depthTest: false, // Ensure it's always visible
+    depthTest: false, // always on top, ignore Z-buffer
   });
 
   const reticle = new THREE.Sprite(spriteMaterial);
-  reticle.scale.set(2.5, 2.5, 2.5); // Adjust size as needed
-  reticle.position.set(0, 0, -10); // Initial position
-
+  reticle.scale.set(2.5, 2.5, 2.5); 
+  reticle.position.set(0, 0, -10); 
 
   scene.add(reticle);
 

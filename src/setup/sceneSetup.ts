@@ -21,8 +21,6 @@ const directionalLight = new THREE.DirectionalLight(0xE1F8DC, .75);
 directionalLight.position.set(10, 10, 5); // (x, y, z)
 scene.add(directionalLight)
 
-
-
 const gridHelper = new THREE.GridHelper(200, 6); // Customize size and divisions as needed
 gridHelper.rotation.x = Math.PI / 2; // Rotate 90 degrees around the X-axis
 scene.add(gridHelper);

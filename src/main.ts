@@ -69,7 +69,7 @@ async function initializeGame() {
     setupDevGUI(camera);
     const reticle = createReticle(camera, scene);
     const enemyManager = new EnemyManager(2000);
-    setupInputListeners(player, scene, reticle, gameState.projectiles);
+    setupInputListeners();
     setupEventListeners();
 
     gameState.renderer = renderer;

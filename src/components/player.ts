@@ -1,14 +1,17 @@
 import * as THREE from 'three';
 import { Projectile } from './projectile';
+import GameState from '../gameState';
 
 export class Player {
+  private readonly gameState = GameState.getInstance();
+
   mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 
   fireRate: number;
   lastShotTime: number;
   enemyTarget: THREE.Vector3 | null = null; // Target starts as null (TODO: consider other options for enemy targeting system)
   maxHealth: number;
   health: number;
-  healthBar: HTMLElement;
+  healthBar: HTMLElement; 
 
   constructor(private playerModel: THREE.Object3D) {
     this.mesh = this.playerModel
@@ -52,16 +55,45 @@ export class Player {
     const currentTime = Date.now();
     return currentTime - this.lastShotTime >= this.fireRate;
   }
+  
+  shoot(): void {
+    if (!this.canShoot()) return;
 
-  shoot(scene: THREE.Scene, target: THREE.Vector3): Projectile | null {
-    if (!this.canShoot() || !this.mesh) return null; // Ensure mesh is ready
+    const targetPosition = this.getTargetFromReticle();
+    if (!targetPosition) return;
 
+    const projectile = this.createProjectile(targetPosition);
+    this.addProjectileToScene(projectile);
+    this.trackProjectile(projectile);
+    this.recordLastShotTime();
+  }
+
+
+  private getTargetFromReticle(): THREE.Vector3 | null {
+    return this.gameState.reticle?.getWorldPosition(new THREE.Vector3()) || null;
+  }
+
+  private createProjectile(targetPosition: THREE.Vector3): Projectile {
+    const direction = this.calculateDirectionToTarget(targetPosition);
+    return new Projectile(this.mesh!.position, direction, 0.2);
+  }
+
+  private calculateDirectionToTarget(targetPosition: THREE.Vector3): THREE.Vector3 {
     const direction = new THREE.Vector3();
-    direction.subVectors(target, this.mesh.position).normalize();
-    const projectile = new Projectile(this.mesh.position, direction, 0.2);
-    scene.add(projectile.mesh);
+    direction.subVectors(targetPosition, this.mesh!.position).normalize();
+    return direction;
+  }
+
+  private addProjectileToScene(projectile: Projectile): void {
+    this.gameState.scene.add(projectile.mesh);
+  }
+
+  private trackProjectile(projectile: Projectile): void {
+    this.gameState.projectiles.push(projectile);
+  }
+
+  private recordLastShotTime(): void {
     this.lastShotTime = Date.now();
-    return projectile;
   }
 
   get position(): THREE.Vector3 | null {

@@ -1,23 +1,15 @@
 import * as THREE from 'three'
-import { Player, Projectile } from './components';
 import { OverlayManager } from './managers';
 import GameState from './gameState';
 
 const keyState: Record<string, boolean> = { w: false, a: false, s: false, d: false }; // Tracks key states
 const gameState = GameState.getInstance();
 
-export function handleShooting(
-  event: MouseEvent, 
-  player: Player, 
-  scene: THREE.Scene, reticle: 
-  THREE.Object3D, 
-  projectiles: Projectile[]) {
+export function handleShooting(event: MouseEvent) {
   if (gameState.isPaused() || !gameState.isGameInitialized()) return;
 
   if (event.button === 0) {
-    const reticlePosition = reticle.getWorldPosition(new THREE.Vector3());
-    const projectile = player.shoot(scene, reticlePosition);
-    if (projectile) projectiles.push(projectile);
+    gameState.player.shoot()
   }
 }
 
@@ -53,10 +45,10 @@ export function setupInputListeners() {
   window.addEventListener('keyup', handleKeyUp);
   //TODO: will need to fix mouse input when adding more mouse inputs, as of now, it just shoots with mouse0
   window.addEventListener('mousedown', (event) =>
-    handleShooting(event, gameState.player, gameState.scene, gameState.reticle, gameState.projectiles)
+    handleShooting(event)
   );
 }
-export function getKeyState() {
+export function getKeyState() { 
   return keyState;
 }
 

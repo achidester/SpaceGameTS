@@ -28,7 +28,7 @@ body {
 
   @font-face {
     font-family: 'DigitalClock';
-    src: url('../public/fonts/DS-DIGIB.TTF') format('truetype');
+    src: url('../fonts/DS-DIGIB.TTF') format('truetype');
     font-display: swap;
   }
   

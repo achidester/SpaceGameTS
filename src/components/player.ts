@@ -7,16 +7,16 @@ export class Player {
 
   mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 
   fireRate: number;
-  lastShotTime: number;
+  lastShotTime: number = 0;
   enemyTarget: THREE.Vector3 | null = null; // Target starts as null (TODO: consider other options for enemy targeting system)
   maxHealth: number;
   health: number;
-  healthBar: HTMLElement; 
+  healthBar: HTMLElement;
+  private shootingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private playerModel: THREE.Object3D) {
     this.mesh = this.playerModel
-    this.fireRate = 50;
-    this.lastShotTime = 0;
+    this.fireRate = 320;
     this.maxHealth = 100;
     this.health = this.maxHealth;
     this.healthBar = document.getElementById('playerHealthBar')!;
@@ -52,20 +52,25 @@ export class Player {
   }
 
   canShoot(): boolean {
-    const currentTime = Date.now();
+    const currentTime = performance.now();
     return currentTime - this.lastShotTime >= this.fireRate;
   }
-  
+
   shoot(): void {
-    if (!this.canShoot()) return;
-
-    const targetPosition = this.getTargetFromReticle();
-    if (!targetPosition) return;
-
-    const projectile = this.createProjectile(targetPosition);
-    this.addProjectileToScene(projectile);
-    this.trackProjectile(projectile);
-    this.recordLastShotTime();
+    const now = performance.now();
+    const interval = now - this.lastShotTime;
+  
+    // Fire only if enough time has passed
+    if (interval >= this.fireRate) {
+      this.lastShotTime = now; // Update only when firing
+  
+      const targetPosition = this.getTargetFromReticle();
+      if (!targetPosition) return;
+  
+      const projectile = this.createProjectile(targetPosition);
+      this.addProjectileToScene(projectile);
+      this.trackProjectile(projectile);
+    }
   }
 
 
@@ -92,12 +97,24 @@ export class Player {
     this.gameState.projectiles.push(projectile);
   }
 
-  private recordLastShotTime(): void {
-    this.lastShotTime = Date.now();
-  }
 
   get position(): THREE.Vector3 | null {
     return this.mesh?.position || null;
+  }
+  
+  startShooting(): void {
+    if (!this.shootingInterval) {
+      this.shootingInterval = setInterval(() => {
+        this.shoot();
+      }, this.fireRate / 3); // Call more frequently, but let `shoot()` handle timing
+    }
+  }
+
+  stopShooting(): void {
+    if (this.shootingInterval) {
+      clearInterval(this.shootingInterval);
+      this.shootingInterval = null;
+    }
   }
 
   updateEnemyTarget() {
@@ -109,5 +126,5 @@ export class Player {
       );
     }
   }
-  
+
 }

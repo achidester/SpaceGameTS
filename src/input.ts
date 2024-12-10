@@ -1,15 +1,21 @@
-import * as THREE from 'three'
 import { OverlayManager } from './managers';
 import GameState from './gameState';
 
 const keyState: Record<string, boolean> = { w: false, a: false, s: false, d: false }; // Tracks key states
 const gameState = GameState.getInstance();
 
-export function handleShooting(event: MouseEvent) {
+export function handleMouseDown(event: MouseEvent) {
   if (gameState.isPaused() || !gameState.isGameInitialized()) return;
 
   if (event.button === 0) {
-    gameState.player.shoot()
+    gameState.player.startShooting(); // Start continuous shooting
+    gameState.player.shoot();
+  }
+}
+
+export function handleMouseUp(event: MouseEvent) {
+  if (event.button === 0) {
+    gameState.player.stopShooting(); // Stop continuous shooting
   }
 }
 
@@ -49,10 +55,8 @@ export function handleKeyUp(event: KeyboardEvent) {
 export function setupInputListeners() {
   window.addEventListener('keydown', handleKeyDown);
   window.addEventListener('keyup', handleKeyUp);
-  //TODO: will need to fix mouse input when adding more mouse inputs, as of now, it just shoots with mouse0
-  window.addEventListener('mousedown', (event) =>
-    handleShooting(event)
-  );
+  window.addEventListener('mousedown', handleMouseDown); // Updated to call handleMouseDown
+  window.addEventListener('mouseup', handleMouseUp); // Added for stopping shooting
 }
 export function getKeyState() { 
   return keyState;

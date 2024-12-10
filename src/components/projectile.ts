@@ -10,11 +10,11 @@ export class Projectile {
 
   constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = 50) {
     this.mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry( .05, .05, 2, 16 ),
+      new THREE.CylinderGeometry( .025, .025, 2, 16 ),
       new THREE.MeshStandardMaterial({
         color: 0x0BFF3F,
-        emissive: 0x0BFF3F,
-        emissiveIntensity: 1.0, // Increase for stronger glow
+        emissive: 0xfcba03,
+        emissiveIntensity: 1.25, // Increase for stronger glow
       }) 
     );
     this.mesh.rotation.x = Math.PI / 2

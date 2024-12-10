@@ -43,7 +43,7 @@ export async function setupScene(
     new THREE.Vector2(window.innerWidth, window.innerHeight),
     1.5, // Strength
     0.4, // Radius
-    0.85 // Threshold
+    0.4 // Threshold
   );
   composer.addPass(bloomPass);
 

@@ -101,4 +101,4 @@ export class UI {
     this.drawHealthBar(currentHealth);
     this.drawPlayTime(playTime);
   }
-}
+} 

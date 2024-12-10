@@ -8,6 +8,7 @@ import { setupEventListeners, setupInputListeners } from './input';
 import GameState from './gameState';
 import { PlayerFactory } from './setup/playerFactory';
 
+
 const canvasManager = new CanvasManager(['gameCanvas']);
 canvasManager.enablePointerLock();
 canvasManager.enableAutoResize();

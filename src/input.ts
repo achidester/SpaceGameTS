@@ -23,15 +23,15 @@ export function handleKeyDown(event: KeyboardEvent) {
   const keyActions: { [key: string]: () => void } = {
     Tab: () => {
       const overlayManager = OverlayManager.getInstance();
-      if (gameState.isGameInitialized()) {
-        if (gameState.isPaused()) {
-          gameState.resumeTimer(); // Resume playtime when unpausing
-          overlayManager.hidePauseOverlay();
-        } else {
-          gameState.stopTimer(); // Stop playtime when pausing
-          overlayManager.showPauseOverlay();
-        }
+      
+      if (gameState.isPaused()) {
+        gameState.resumeTimer(); // Resume playtime when unpausing
+        overlayManager.hidePauseOverlay();
+      } else {
+        gameState.stopTimer(); // Stop playtime when pausing
+        overlayManager.showPauseOverlay();
       }
+
     },
     // Add other keys with specific actions here:
     // W: () => console.log('Move forward'),

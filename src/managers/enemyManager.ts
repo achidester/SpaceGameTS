@@ -84,7 +84,7 @@ export class EnemyManager {
       direction.subVectors(player.enemyTarget!, enemy.position).normalize();
 
       enemy.position.add(direction.multiplyScalar(ENEMY_SPEED));
-
+      
       if (enemy.position.z <= player.enemyTarget!.z) {
         this.removeEnemy(enemy, index);
       }

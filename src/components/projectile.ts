@@ -7,11 +7,17 @@ export class Projectile {
   maxRange: number;
   speed: number;
 
+
   constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = 50) {
     this.mesh = new THREE.Mesh(
-      new THREE.SphereGeometry(0.1, 8, 8),
-      new THREE.MeshBasicMaterial({ color: 0x0BFF3F })
+      new THREE.CylinderGeometry( .05, .05, 2, 16 ),
+      new THREE.MeshStandardMaterial({
+        color: 0x0BFF3F,
+        emissive: 0x0BFF3F,
+        emissiveIntensity: 1.0, // Increase for stronger glow
+      }) 
     );
+    this.mesh.rotation.x = Math.PI / 2
     this.mesh.position.copy(position);
     this.speed = .1 // intense curve here. 
 
@@ -26,6 +32,14 @@ export class Projectile {
   update() {
     // Move the projectile according to its velocity
     this.mesh.position.add(this.velocity.clone().multiplyScalar(this.speed));
+    this.adjustBeamDirection()
+  }
+
+  adjustBeamDirection() {
+    const direction = this.velocity.clone().normalize();
+    const axis = new THREE.Vector3(0, 1, 0); // Default cylinder up direction
+    const quaternion = new THREE.Quaternion().setFromUnitVectors(axis, direction);
+    this.mesh.quaternion.copy(quaternion);
   }
 
   hasExceededRange(customMaxRange?: number): boolean {

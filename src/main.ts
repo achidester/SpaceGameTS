@@ -13,21 +13,18 @@ const canvasManager = new CanvasManager(['gameCanvas']);
 canvasManager.enablePointerLock();
 canvasManager.enableAutoResize();
 const canvas = canvasManager.getCanvas('gameCanvas')
-const renderer = setupRenderer(canvas);
+// const renderer = setupRenderer(canvas);
 const resourceManager = new ResourceManager();
 const playerFactory = new PlayerFactory(resourceManager);
 
 
 function animate() {
   const gameState = GameState.getInstance();
-  let lastFrameTime = performance.now();
 
   function loop() {
     requestAnimationFrame(loop);
 
-    const currentFrameTime = performance.now();
-    const deltaTime = (currentFrameTime - lastFrameTime) / 1000; // Convert to seconds
-    lastFrameTime = currentFrameTime;
+    
 
     if (gameState.isLoading || gameState.isPaused()) {
       document.exitPointerLock();
@@ -40,7 +37,7 @@ function animate() {
     }
 
     gameState.projectiles.forEach((projectile, index) => {
-      projectile.update(deltaTime * 200 );
+      projectile.update();
       if (projectile.hasExceededRange()) {
         gameState.scene.remove(projectile.mesh);
         gameState.projectiles.splice(index, 1);
@@ -53,7 +50,10 @@ function animate() {
     gameState.player.mesh!.lookAt(gameState.reticle.getWorldPosition(new THREE.Vector3()));
     gameState.enemyManager.update(elapsedPlayTime);
 
-    renderer.render(gameState.scene, gameState.camera);
+    // Use composer if post-processing is needed
+    if (gameState.composer) { gameState.composer.render(); } 
+    else { gameState.renderer.render(gameState.scene, gameState.camera); }
+
     gameState.stats.update();
     
     gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime())
@@ -66,9 +66,12 @@ async function initializeGame() {
   const gameState = GameState.getInstance();
   try {
     console.log('Starting game initialization...');
-    const { scene } = await setupScene(); 
-    const player = await playerFactory.createPlayer();
+
+    const renderer = setupRenderer(canvas);
     const { camera } = setupCamera(new THREE.Vector3(0,0,5));
+    const { scene, composer } = await setupScene(renderer, camera); 
+
+    const player = await playerFactory.createPlayer();
     const ui = setupGameUI(player.maxHealth);
     const stats = setupStats();
     const reticle = createReticle(camera, scene);
@@ -80,6 +83,7 @@ async function initializeGame() {
     setupEventListeners();
     gameState.resetTimer();
     gameState.renderer = renderer;
+    gameState.composer = composer; 
     gameState.scene = scene;
     gameState.camera = camera;
     gameState.player = player;

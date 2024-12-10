@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Player, Projectile, UI } from './components';
 import { EnemyManager, OverlayManager } from './managers';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 
 class GameState {
   private static instance: GameState;
@@ -8,6 +9,7 @@ class GameState {
   renderer!: THREE.WebGLRenderer;
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
+  composer!: EffectComposer;
   player!: Player;
   reticle!: THREE.Object3D;
   enemyManager!: EnemyManager;
@@ -64,6 +66,7 @@ class GameState {
   }
 
   public isPaused(): boolean {
+    
     return this.paused;
   }
   public setPaused(value: boolean): void {

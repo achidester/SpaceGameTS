@@ -80,7 +80,7 @@ export class Player {
 
   private createProjectile(targetPosition: THREE.Vector3): Projectile {
     const direction = this.calculateDirectionToTarget(targetPosition);
-    return new Projectile(this.mesh!.position, direction, 0.2);
+    return new Projectile(this.mesh!.position, direction);
   }
 
   private calculateDirectionToTarget(targetPosition: THREE.Vector3): THREE.Vector3 {

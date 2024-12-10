@@ -5,25 +5,27 @@ export class Projectile {
   velocity: THREE.Vector3;
   startPosition: THREE.Vector3;
   maxRange: number;
+  speed: number;
 
-  constructor(position: THREE.Vector3, direction: THREE.Vector3, speed: number = 0.2, maxRange: number = 50) {
+  constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = 50) {
     this.mesh = new THREE.Mesh(
       new THREE.SphereGeometry(0.1, 8, 8),
       new THREE.MeshBasicMaterial({ color: 0x0BFF3F })
     );
     this.mesh.position.copy(position);
+    this.speed = .1 // intense curve here. 
 
     // Track the start position to calculate travel distance
     this.startPosition = position.clone();
     this.maxRange = maxRange;
 
     // Set the initial velocity based on the direction and speed
-    this.velocity = direction.clone().normalize().multiplyScalar(speed);
+    this.velocity = direction.clone().normalize();
   }
 
   update() {
     // Move the projectile according to its velocity
-    this.mesh.position.add(this.velocity);
+    this.mesh.position.add(this.velocity.clone().multiplyScalar(this.speed));
   }
 
   hasExceededRange(customMaxRange?: number): boolean {

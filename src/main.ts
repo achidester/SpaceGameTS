@@ -20,9 +20,14 @@ const playerFactory = new PlayerFactory(resourceManager);
 
 function animate() {
   const gameState = GameState.getInstance();
+  let lastFrameTime = performance.now();
 
   function loop() {
     requestAnimationFrame(loop);
+
+    const currentFrameTime = performance.now();
+    const deltaTime = (currentFrameTime - lastFrameTime) / 1000; // Convert to seconds
+    lastFrameTime = currentFrameTime;
 
     if (gameState.isLoading || gameState.isPaused()) {
       document.exitPointerLock();
@@ -35,7 +40,7 @@ function animate() {
     }
 
     gameState.projectiles.forEach((projectile, index) => {
-      projectile.update();
+      projectile.update(deltaTime * 200 );
       if (projectile.hasExceededRange()) {
         gameState.scene.remove(projectile.mesh);
         gameState.projectiles.splice(index, 1);

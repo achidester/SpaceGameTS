@@ -25,7 +25,7 @@ function animate() {
     requestAnimationFrame(loop);
 
     if (gameState.isLoading || gameState.isPaused()) {
-      if (!gameState.isPaused()) document.exitPointerLock();
+      document.exitPointerLock();
       return;
     }
 

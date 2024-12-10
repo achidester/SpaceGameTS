@@ -28,13 +28,14 @@ export function handleKeyDown(event: KeyboardEvent) {
         gameState.resumeTimer(); // Resume playtime when unpausing
         overlayManager.hidePauseOverlay();
       } else {
+  
         gameState.stopTimer(); // Stop playtime when pausing
         overlayManager.showPauseOverlay();
       }
 
     },
     // Add other keys with specific actions here:
-    // W: () => console.log('Move forward'),
+    // X: () => console.log('drop a bomb or something idk'),
   };
   // Check if the key is mapped to an action
   const action = keyActions[event.key];

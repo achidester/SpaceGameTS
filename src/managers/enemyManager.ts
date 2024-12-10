@@ -65,7 +65,7 @@ export class EnemyManager {
 
   public update(playTime: number): void {
     const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
-    const intensityFactor = 0.2; // Scaling intensity for faster enemy spawns
+    const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
     this.spawnInterval = Math.max(
       200, // Minimum spawn interval to prevent overwhelming the system
       baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor)

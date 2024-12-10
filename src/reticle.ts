@@ -7,6 +7,7 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
     map: reticleTexture,
     transparent: true,
     depthTest: false, // always on top, ignore Z-buffer
+    opacity: .45,
   });
 
   const reticle = new THREE.Sprite(spriteMaterial);

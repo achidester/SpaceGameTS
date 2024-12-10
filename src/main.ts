@@ -49,7 +49,8 @@ function animate() {
 
     renderer.render(gameState.scene, gameState.camera);
     gameState.stats.update();
-    gameState.ui.drawHealthBar(gameState.player.health);
+    
+    gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime())
   }
   loop();
 }
@@ -59,7 +60,7 @@ async function initializeGame() {
   const gameState = GameState.getInstance();
   try {
     console.log('Starting game initialization...');
-    const { scene } = await setupScene();
+    const { scene } = await setupScene(); 
     const player = await playerFactory.createPlayer();
     const { camera } = setupCamera(new THREE.Vector3(0,0,5));
     const ui = setupGameUI(player.maxHealth);
@@ -71,7 +72,7 @@ async function initializeGame() {
     setupDevGUI(camera);
     setupInputListeners();
     setupEventListeners();
-
+    gameState.resetTimer();
     gameState.renderer = renderer;
     gameState.scene = scene;
     gameState.camera = camera;

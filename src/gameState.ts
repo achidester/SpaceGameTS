@@ -50,6 +50,12 @@ class GameState {
       this.lastResumeTime = Date.now();
     }
   }
+
+  public resetTimer(): void {
+    this.playTime = 0;
+    this.lastResumeTime = Date.now();
+  }
+
   public getPlayTime(): number {
     if (this.paused) {
       return this.playTime; // Return accumulated playtime when paused

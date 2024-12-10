@@ -25,6 +25,18 @@ body {
     pointer-events: none; /* Allow clicks to pass through */
     z-index: 5; /* Ensure it's above the canvas but below the pause overlay */
   }
+
+  @font-face {
+    font-family: 'DigitalClock';
+    src: url('../public/fonts/DS-DIGIB.TTF') format('truetype');
+    font-display: swap;
+  }
+  
+  .digital-text {
+    font-family: 'DigitalClock', Arial, sans-serif;
+    font-size: 16px;
+    color: white;
+  }
   
   #playerHealthBarContainer {
     position: absolute;

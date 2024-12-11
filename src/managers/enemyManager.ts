@@ -7,10 +7,10 @@ const MIN_SPAWN_DISTANCE = 15;
 const MAX_SPAWN_DISTANCE = 25;
 const COLLISION_WITH_PLAYER_TOLERANCE = 1;
 const ENEMY_PLAYER_DAMAGE_CONTACT = 0;
-
+const ENEMY_KILL_SCORE = 50;
 
 export class EnemyManager {
-  private gameState = GameState.getInstance();
+  private readonly gameState = GameState.getInstance();
   private enemies: Enemy[] = [];
   private enemySpawnTimer: number = 0;
   private spawnInterval: number;
@@ -23,7 +23,7 @@ export class EnemyManager {
 
   public update(playTime: number): void {
     const minSpawnInterval = 200; // Min spawn interval in milliseconds
-    const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
+    const baseSpawnInterval = 1000; // Base spawn interval in milliseconds
     const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
     const currentSpawnInterval = Math.max(minSpawnInterval, baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor));
     this.spawnInterval = currentSpawnInterval;
@@ -86,10 +86,10 @@ export class EnemyManager {
   private checkCollisionsWithProjectiles(enemy: Enemy, enemyIndex: number): void {
     this.gameState.projectiles.forEach((projectile, projectileIndex) => {
       const distance = enemy.object.position.distanceTo(projectile.mesh.position);
-      if (distance < 1) {
+      if (distance <= 1) {
         this.removeEnemy(enemy, enemyIndex);
         this.removeProjectile(projectile, projectileIndex);
-        this.gameState.addScore(50);
+        this.gameState.addScore(ENEMY_KILL_SCORE);
       }
     });
   }

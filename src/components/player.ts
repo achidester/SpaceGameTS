@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { Projectile } from './projectile';
 import GameState from '../gameState';
 
+
 export class Player {
   private readonly gameState = GameState.getInstance();
 
   mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 
   fireRate: number;
   lastShotTime: number = 0;
-  enemyTarget: THREE.Vector3 | null = null; // Target starts as null (TODO: consider other options for enemy targeting system)
+  enemyTarget: THREE.Vector3 | null = null;
   maxHealth: number;
   health: number;
   healthBar: HTMLElement;
@@ -27,7 +28,7 @@ export class Player {
     );
   }
 
-  showDeathScreen() {
+  private showDeathScreen() {
     if (this.health > 0) return;
     const deathOverlay = document.getElementById("deathOverlay");
     if (deathOverlay) {
@@ -42,7 +43,7 @@ export class Player {
     }
   }
 
-  takeDamage(damage: number) {
+  public takeDamage(damage: number) {
     this.health -= damage;
     this.health = Math.max(0, this.health); // Ensure health doesn't go below 0
     if (this.health <= 0) {
@@ -51,26 +52,20 @@ export class Player {
     }
   }
 
-  canShoot(): boolean {
+  private canShoot(): boolean {
     const currentTime = performance.now();
     return currentTime - this.lastShotTime >= this.fireRate;
   }
 
-  shoot(): void {
-    const now = performance.now();
-    const interval = now - this.lastShotTime;
-  
-    // Fire only if enough time has passed
-    if (interval >= this.fireRate) {
-      this.lastShotTime = now; // Update only when firing
-  
-      const targetPosition = this.getTargetFromReticle();
-      if (!targetPosition) return;
-  
-      const projectile = this.createProjectile(targetPosition);
-      this.addProjectileToScene(projectile);
-      this.trackProjectile(projectile);
-    }
+  public shoot(): void {
+    if (!this.canShoot()) return; 
+    this.lastShotTime = performance.now();
+    const targetPosition = this.getTargetFromReticle()
+    ;
+    if (!targetPosition) return;
+    const projectile = this.createProjectile(targetPosition);
+    this.addProjectileToScene(projectile);
+    this.trackProjectile(projectile);
   }
 
 
@@ -102,7 +97,7 @@ export class Player {
     return this.mesh?.position || null;
   }
   
-  startShooting(): void {
+  public startShooting(): void {
     if (!this.shootingInterval) {
       this.shootingInterval = setInterval(() => {
         this.shoot();
@@ -110,14 +105,14 @@ export class Player {
     }
   }
 
-  stopShooting(): void {
+  public stopShooting(): void {
     if (this.shootingInterval) {
       clearInterval(this.shootingInterval);
       this.shootingInterval = null;
     }
   }
 
-  updateEnemyTarget() {
+  public updateEnemyTarget() {
     if (this.mesh && this.enemyTarget) {
       this.enemyTarget.set(
         this.mesh.position.x,

@@ -6,6 +6,9 @@ import { EnemyFactory } from '../factories/enemyFactory';
 
 const MIN_SPAWN_DISTANCE = 15;
 const MAX_SPAWN_DISTANCE = 25;
+const COLLISION_WITH_PLAYER_TOLERANCE = 1;
+const ENEMY_PLAYER_DAMAGE_CONTACT = 0;
+
 
 export class EnemyManager {
   private gameState = GameState.getInstance();
@@ -94,8 +97,8 @@ export class EnemyManager {
 
   private checkCollisionWithPlayer(enemy: Enemy, index: number, player: Player) {
     const distanceToPlayer = enemy.object.position.distanceTo(player.position!);
-    if (distanceToPlayer < 1) {
-      player.takeDamage(0);
+    if (distanceToPlayer < COLLISION_WITH_PLAYER_TOLERANCE) {
+      player.takeDamage(ENEMY_PLAYER_DAMAGE_CONTACT);
       this.removeEnemy(enemy, index);
     }
   }

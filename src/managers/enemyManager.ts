@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import { Enemy } from '../components/enemy';
 import GameState from '../gameState';
-import { Player, Projectile } from '../components';
+import { Player, Projectile, Enemy } from '../components';
 import { EnemyFactory } from '../factories/enemyFactory';
 
 const MIN_SPAWN_DISTANCE = 15;

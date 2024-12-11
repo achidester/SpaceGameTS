@@ -2,15 +2,18 @@ import * as THREE from 'three';
 import { createEnemyMesh, ENEMY_SPEED, MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE } from '../components/enemy';
 import GameState from '../gameState';
 import { Projectile } from '../components';
+import { EnemyFactory } from '../components/enemy';
 
 export class EnemyManager {
   private gameState = GameState.getInstance();
-  private enemies: THREE.Mesh[] = [];
+  private enemies: THREE.Object3D[] = [];
   private enemySpawnTimer: number = 0;
   private spawnInterval: number;
+  private enemyFactory: EnemyFactory;
 
   constructor(spawnInterval: number = 500) {
     this.spawnInterval = spawnInterval;
+    this.enemyFactory = new EnemyFactory()
     
   }
 
@@ -27,18 +30,23 @@ export class EnemyManager {
     );
   }
 
-  private spawnEnemy(): void {
+  private async spawnEnemy(): Promise<void> {
     const playerPosition = this.gameState.player.position!;
     const spawnPosition = this.getSpawnPosition(playerPosition);
 
-    const enemy = createEnemyMesh();
-    enemy.position.copy(spawnPosition);
+    try {
+      // Use EnemyFactory to create an enemy model
+      const enemy = await this.enemyFactory.createEnemy();
+      enemy.position.copy(spawnPosition);
 
-    this.gameState.scene.add(enemy);
-    this.enemies.push(enemy);
+      this.gameState.scene.add(enemy);
+      this.enemies.push(enemy);
+    } catch (error) {
+      console.error('Failed to spawn enemy:', error);
+    }
   }
 
-  private removeEnemy(enemy: THREE.Mesh, index: number): void {
+  private removeEnemy(enemy: THREE.Object3D, index: number): void {
     this.gameState.scene.remove(enemy);
     this.enemies.splice(index, 1);
   }
@@ -90,6 +98,14 @@ export class EnemyManager {
         this.removeEnemy(enemy, index);
       }
 
+      // Rotate the enemy to face the player (ALL AXIS)
+      // const lookAtPosition = new THREE.Vector3().copy(player.position!);
+      // enemy.lookAt(lookAtPosition);
+
+      // Calculate rotation to face the player around the y-axis
+      const angle = Math.atan2(direction.x, direction.z); // Calculate the yaw angle
+      enemy.rotation.y = angle; // Set the y-axis rotation
+
       const distanceToPlayer = enemy.position.distanceTo(player.position!);
       if (distanceToPlayer < 1) {
         player.takeDamage(0);
@@ -101,7 +117,7 @@ export class EnemyManager {
     this.checkCollisions();
   }
 
-  public getEnemies(): THREE.Mesh[] {
+  public getEnemies(): THREE.Object3D[] {
     return this.enemies;
   }
 }

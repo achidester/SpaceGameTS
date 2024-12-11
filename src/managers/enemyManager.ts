@@ -1,12 +1,12 @@
 import * as THREE from 'three';
-import { createEnemyMesh, ENEMY_SPEED, MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE } from '../components/enemy';
+import { MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE, Enemy } from '../components/enemy';
 import GameState from '../gameState';
 import { Projectile } from '../components';
-import { EnemyFactory } from '../components/enemy';
+import { EnemyFactory } from '../factories/enemyFactory';
 
 export class EnemyManager {
   private gameState = GameState.getInstance();
-  private enemies: THREE.Object3D[] = [];
+  private enemies: Enemy[] = [];
   private enemySpawnTimer: number = 0;
   private spawnInterval: number;
   private enemyFactory: EnemyFactory;
@@ -14,7 +14,7 @@ export class EnemyManager {
   constructor(spawnInterval: number = 500) {
     this.spawnInterval = spawnInterval;
     this.enemyFactory = new EnemyFactory()
-    
+
   }
 
   private getSpawnPosition(playerPosition: THREE.Vector3): THREE.Vector3 {
@@ -37,17 +37,17 @@ export class EnemyManager {
     try {
       // Use EnemyFactory to create an enemy model
       const enemy = await this.enemyFactory.createEnemy();
-      enemy.position.copy(spawnPosition);
+      enemy.object.position.copy(spawnPosition);
 
-      this.gameState.scene.add(enemy);
+      this.gameState.scene.add(enemy.object);
       this.enemies.push(enemy);
     } catch (error) {
       console.error('Failed to spawn enemy:', error);
     }
   }
 
-  private removeEnemy(enemy: THREE.Object3D, index: number): void {
-    this.gameState.scene.remove(enemy);
+  private removeEnemy(enemy: Enemy, index: number): void {
+    this.gameState.scene.remove(enemy.object);
     this.enemies.splice(index, 1);
   }
 
@@ -60,7 +60,7 @@ export class EnemyManager {
   private checkCollisions(): void {
     this.enemies.forEach((enemy, enemyIndex) => {
       this.gameState.projectiles.forEach((projectile, projectileIndex) => {
-        const distance = enemy.position.distanceTo(projectile.mesh.position);
+        const distance = enemy.object.position.distanceTo(projectile.mesh.position);
 
         if (distance < 1) {
           // Collision detecteds
@@ -90,11 +90,11 @@ export class EnemyManager {
     this.enemies.forEach((enemy, index) => {
       const player = this.gameState.player;
       const direction = new THREE.Vector3();
-      direction.subVectors(player.enemyTarget!, enemy.position).normalize();
+      direction.subVectors(player.enemyTarget!, enemy.object.position).normalize();
 
-      enemy.position.add(direction.multiplyScalar(ENEMY_SPEED));
-      
-      if (enemy.position.z <= player.enemyTarget!.z) {
+      enemy.object.position.add(direction.multiplyScalar(enemy.speed));
+
+      if (enemy.object.position.z <= player.enemyTarget!.z) {
         this.removeEnemy(enemy, index);
       }
 
@@ -104,20 +104,21 @@ export class EnemyManager {
 
       // Calculate rotation to face the player around the y-axis
       const angle = Math.atan2(direction.x, direction.z); // Calculate the yaw angle
-      enemy.rotation.y = angle; // Set the y-axis rotation
+      enemy.object.rotation.y = angle; // Set the y-axis rotation
 
-      const distanceToPlayer = enemy.position.distanceTo(player.position!);
+      const distanceToPlayer = enemy.object.position.distanceTo(player.position!);
       if (distanceToPlayer < 1) {
         player.takeDamage(0);
         this.removeEnemy(enemy, index);
       }
-    });
+    }
+    );
 
     // Check for collisions
     this.checkCollisions();
   }
 
-  public getEnemies(): THREE.Object3D[] {
+  public getEnemies(): Enemy[] {
     return this.enemies;
   }
 }

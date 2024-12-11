@@ -102,7 +102,7 @@ export class EnemyManager {
       // const lookAtPosition = new THREE.Vector3().copy(player.position!);
       // enemy.lookAt(lookAtPosition);
 
-      // Calculate rotation to face the player around the y-axis
+      // Calculate rotation to face the player around the y-axis (YAW rotation)
       const angle = Math.atan2(direction.x, direction.z); // Calculate the yaw angle
       enemy.object.rotation.y = angle; // Set the y-axis rotation
 

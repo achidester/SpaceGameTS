@@ -1,10 +1,6 @@
 import { ResourceManager } from '../managers';
 import { Enemy } from '../components/enemy';
 
-export const ENEMY_SIZE = .5;
-export const ENEMY_SPEED = 0.2;
-export const MIN_SPAWN_DISTANCE = 15;
-export const MAX_SPAWN_DISTANCE = 25;
 
 export class EnemyFactory {
     private resourceManager: ResourceManager;

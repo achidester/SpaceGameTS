@@ -7,12 +7,18 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
     map: reticleTexture,
     transparent: true,
     depthTest: false, // always on top, ignore Z-buffer
-    opacity: .45,
+    opacity: .25,
   });
 
   const reticle = new THREE.Sprite(spriteMaterial);
   reticle.scale.set(2.5, 2.5, 2.5); 
-  reticle.position.set(0, 0, -5); 
+  
+  // Initialize the reticle at a default distance
+  const reticleDistance = 50;
+  const initialZ = .1; // Small z value for closer projection
+  const initialPosition = new THREE.Vector3(0, 0, initialZ).unproject(camera);
+  const initialDirection = initialPosition.sub(camera.position).normalize();
+  reticle.position.copy(camera.position).add(initialDirection.multiplyScalar(reticleDistance));
 
   scene.add(reticle);
 
@@ -20,7 +26,6 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
   let accumulatedMouseX = 0;
   let accumulatedMouseY = 0;
   
-  const reticleDistance = 50;
 
   document.addEventListener('pointerlockchange', () => {
     isPointerLocked = !!document.pointerLockElement;
@@ -39,7 +44,7 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
       accumulatedMouseY = -(event.clientY / window.innerHeight) * 2 + 1;
     }
 
-    const reticlePosition = new THREE.Vector3(accumulatedMouseX, accumulatedMouseY, -1).unproject(camera);
+    const reticlePosition = new THREE.Vector3(accumulatedMouseX, accumulatedMouseY, initialZ).unproject(camera);
 
     const direction = reticlePosition.sub(camera.position).normalize();
     reticle.position.copy(camera.position).add(direction.multiplyScalar(reticleDistance));

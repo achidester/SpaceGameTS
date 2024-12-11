@@ -6,7 +6,7 @@ import { updateObjectPosition } from './userControls';
 import { EnemyManager, OverlayManager, CanvasManager, ResourceManager } from './managers';
 import { setupEventListeners, setupInputListeners } from './input';
 import GameState from './gameState';
-import { PlayerFactory } from './setup/playerFactory';
+import { PlayerFactory } from './factories/playerFactory';
 
 
 const canvasManager = new CanvasManager(['gameCanvas']);

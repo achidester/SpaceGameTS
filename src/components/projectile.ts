@@ -7,7 +7,6 @@ export class Projectile {
   maxRange: number;
   speed: number;
 
-
   constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = 50) {
     this.mesh = new THREE.Mesh(
       new THREE.CylinderGeometry( .025, .025, 2, 16 ),

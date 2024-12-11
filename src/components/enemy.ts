@@ -9,8 +9,6 @@ export class Enemy {
     this.object = object;
     this.speed = speed;
     this.size = size;
-
-    // Apply size to the object
     this.object.scale.set(size, size, size);
   }
 }

@@ -56,7 +56,7 @@ function animate() {
 
     gameState.stats.update();
     
-    gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime())
+    gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime(), gameState.getScore())
   }
   loop();
 }

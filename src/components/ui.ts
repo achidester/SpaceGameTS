@@ -6,6 +6,8 @@ export class UI {
   constructor(playerMaxHealth: number) {
     this.uiCanvas = document.createElement('canvas');
     this.uiCanvas.style.position = 'absolute';
+    this.uiCanvas.style.margin = '25px';
+    this.uiCanvas.style.paddingTop = '20px';
     this.uiCanvas.style.bottom = '0';
     this.uiCanvas.style.right = '0';
     this.uiCanvas.style.pointerEvents = 'none';
@@ -92,13 +94,33 @@ export class UI {
     this.uiContext.fillText(timerText, x, y);
   }
 
+  drawScore(score: number) {
+    const barWidth = 200; // Match other UI elements' width
+    const barHeight = 20; // Match other UI elements' height
+    const verticalPadding = 30; // Padding from the edges
+    const horizontalPadding = 50; // Padding from the edges
+  
+    // Position the score above the play time
+    const x = this.uiCanvas.width - barWidth / 2 - horizontalPadding;
+    const y = this.uiCanvas.height - barHeight - verticalPadding * 3; // Offset above the play time
+  
+    // Draw the score text
+    this.uiContext.fillStyle = 'yellow';
+    this.uiContext.font = '48px DigitalClock';
+    this.uiContext.textAlign = 'center';
+    this.uiContext.textBaseline = 'bottom';
+    this.uiContext.fillText(`xp: ${score}`, x, y);
+  }
+  
+
   private clearCanvas() {
     this.uiContext.clearRect(0, 0, this.uiCanvas.width, this.uiCanvas.height);
   }
 
-  drawUI(currentHealth: number, playTime: number) {
+  drawUI(currentHealth: number, playTime: number, score: number) {
     this.clearCanvas(); // Clear once at the beginning
     this.drawHealthBar(currentHealth);
     this.drawPlayTime(playTime);
+    this.drawScore(score); // Add score to the UI
   }
 } 

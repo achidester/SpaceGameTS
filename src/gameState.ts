@@ -21,6 +21,7 @@ class GameState {
   private lastResumeTime: number = 0; // Timestamp of when the game was last resumed
   private gameInitialized: boolean = false;
   private paused: boolean = false;
+  private gameScore = 0
 
   private constructor() {}
 
@@ -33,6 +34,16 @@ class GameState {
 
   public isGameInitialized(): boolean {
     return this.gameInitialized;
+  }
+
+  public getScore(): number {
+    return this.gameScore;
+  }
+  public addScore(points: number): void {
+    this.gameScore += points;
+  }
+  public resetScore(): void {
+    this.gameScore = 0;
   }
 
   public setGameInitialized(value: boolean): void {

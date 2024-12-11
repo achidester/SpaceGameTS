@@ -12,7 +12,7 @@ export function createReticle(camera: THREE.PerspectiveCamera, scene: THREE.Scen
 
   const reticle = new THREE.Sprite(spriteMaterial);
   reticle.scale.set(2.5, 2.5, 2.5); 
-  reticle.position.set(0, 0, -10); 
+  reticle.position.set(0, 0, -5); 
 
   scene.add(reticle);
 

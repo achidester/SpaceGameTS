@@ -55,9 +55,10 @@ export class EnemyManager {
         const distance = enemy.position.distanceTo(projectile.mesh.position);
 
         if (distance < 1) {
-          // Collision detected
+          // Collision detecteds
           this.removeEnemy(enemy, enemyIndex);
           this.removeProjectile(projectile, projectileIndex);
+          this.gameState.addScore(50);
         }
       });
     });
@@ -67,7 +68,7 @@ export class EnemyManager {
     const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
     const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
     this.spawnInterval = Math.max(
-      200, // Minimum spawn interval to prevent overwhelming the system
+      200, // Minimum spawn interval to prevent overwhelming the system 
       baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor)
     );
 

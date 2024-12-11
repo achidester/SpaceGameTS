@@ -106,7 +106,7 @@ export class EnemyManager {
 
   private rotateEnemyToFacePlayer(enemy: Enemy, player: Player) {
       const direction = new THREE.Vector3();
-      direction.subVectors(player.position!, enemy.object.position).normalize();
+      direction.subVectors(player.enemyTarget!, enemy.object.position).normalize();
       // Rotate the enemy to face the player (ALL AXIS) 
       // probably better long term !!!!!
       // const lookAtPosition = new THREE.Vector3().copy(player.position!);

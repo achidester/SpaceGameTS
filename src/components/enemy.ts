@@ -1,8 +1,5 @@
 import * as THREE from 'three';
 
-export const MIN_SPAWN_DISTANCE = 15;
-export const MAX_SPAWN_DISTANCE = 25;
-
 export class Enemy {
   public object: THREE.Object3D;
   public speed: number;

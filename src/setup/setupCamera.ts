@@ -1,12 +1,25 @@
 import * as THREE from 'three';
 
-export function setupCamera(center: THREE.Vector3): { camera: THREE.PerspectiveCamera } {
-    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+const CameraConfig = {
+  fov: 55, // Field of view
+  aspectRatio: window.innerWidth / window.innerHeight,
+  nearClipping: 0.1,
+  farClipping: 1000,
+  initialPosition: new THREE.Vector3(0, 0, 0),
+  lookAtTarget: new THREE.Vector3(0, 0, 5),
+};
+
+export function setupCamera(): { camera: THREE.PerspectiveCamera } {
+    const camera = new THREE.PerspectiveCamera(
+      CameraConfig.fov, 
+      CameraConfig.aspectRatio,
+      CameraConfig.nearClipping, 
+      CameraConfig.farClipping
+    );
 
     // Set a fixed position for the camera, slightly above and behind the player.
-    // Adjust the values here to set the initial view as desired.
-    camera.position.set(0, 0, 0); // Example position: 10 units up and 20 units back along Z-axis
-    camera.lookAt(center); // Ensure the camera initially looks at the player’s position
+    camera.position.copy(CameraConfig.initialPosition); 
+    camera.lookAt(CameraConfig.lookAtTarget); 
 
     // Handle window resizing to maintain the aspect ratio
     window.addEventListener('resize', () => {

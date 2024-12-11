@@ -68,7 +68,7 @@ async function initializeGame() {
     console.log('Starting game initialization...');
 
     const renderer = setupRenderer(canvas);
-    const { camera } = setupCamera(new THREE.Vector3(0,0,5));
+    const { camera } = setupCamera();
     const { scene, composer } = await setupScene(renderer, camera); 
 
     const player = await playerFactory.createPlayer();

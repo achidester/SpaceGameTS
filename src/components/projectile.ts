@@ -19,7 +19,7 @@ export class Projectile {
     );
     this.mesh.rotation.x = Math.PI / 2
     this.mesh.position.copy(position);
-    this.speed = .1 // intense curve here. 
+    this.speed = .5 // intense curve here. 
 
     // Track the start position to calculate travel distance
     this.startPosition = position.clone();

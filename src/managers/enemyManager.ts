@@ -1,8 +1,11 @@
 import * as THREE from 'three';
-import { MIN_SPAWN_DISTANCE, MAX_SPAWN_DISTANCE, Enemy } from '../components/enemy';
+import { Enemy } from '../components/enemy';
 import GameState from '../gameState';
-import { Projectile } from '../components';
+import { Player, Projectile } from '../components';
 import { EnemyFactory } from '../factories/enemyFactory';
+
+const MIN_SPAWN_DISTANCE = 15;
+const MAX_SPAWN_DISTANCE = 25;
 
 export class EnemyManager {
   private gameState = GameState.getInstance();
@@ -10,11 +13,34 @@ export class EnemyManager {
   private enemySpawnTimer: number = 0;
   private spawnInterval: number;
   private enemyFactory: EnemyFactory;
-
+  
   constructor(spawnInterval: number = 500) {
     this.spawnInterval = spawnInterval;
     this.enemyFactory = new EnemyFactory()
 
+  }
+
+  public update(playTime: number): void {
+    const minSpawnInterval = 200; // Min spawn interval in milliseconds
+    const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
+    const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
+    const currentSpawnInterval = Math.max( minSpawnInterval, baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor));
+    this.spawnInterval = currentSpawnInterval;
+    const isSpawnTime = Date.now() - this.enemySpawnTimer > this.spawnInterval;
+
+    if (isSpawnTime) {
+      this.spawnEnemy();
+      this.enemySpawnTimer = Date.now();
+    }
+
+    this.enemies.forEach((enemy, index) => {
+      const player = this.gameState.player;
+      this.updateEnemyPosition(enemy, index, player);
+      this.rotateEnemyToFacePlayer(enemy, player);
+      this.checkCollisionWithPlayer(enemy, index, player);
+    });
+
+    this.checkCollisionsWithProjectile();
   }
 
   private getSpawnPosition(playerPosition: THREE.Vector3): THREE.Vector3 {
@@ -57,13 +83,11 @@ export class EnemyManager {
     this.gameState.projectiles.splice(index, 1);
   }
 
-  private checkCollisions(): void {
+  private checkCollisionsWithProjectile(): void {
     this.enemies.forEach((enemy, enemyIndex) => {
       this.gameState.projectiles.forEach((projectile, projectileIndex) => {
         const distance = enemy.object.position.distanceTo(projectile.mesh.position);
-
         if (distance < 1) {
-          // Collision detecteds
           this.removeEnemy(enemy, enemyIndex);
           this.removeProjectile(projectile, projectileIndex);
           this.gameState.addScore(50);
@@ -72,50 +96,38 @@ export class EnemyManager {
     });
   }
 
-  public update(playTime: number): void {
-    const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
-    const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
-    this.spawnInterval = Math.max(
-      200, // Minimum spawn interval to prevent overwhelming the system 
-      baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor)
-    );
-
-    // Check if it's time to spawn a new enemy
-    if (Date.now() - this.enemySpawnTimer > this.spawnInterval) {
-      this.spawnEnemy();
-      this.enemySpawnTimer = Date.now();
-    }
-
-    // Move enemies and check collisions
-    this.enemies.forEach((enemy, index) => {
-      const player = this.gameState.player;
-      const direction = new THREE.Vector3();
-      direction.subVectors(player.enemyTarget!, enemy.object.position).normalize();
-
-      enemy.object.position.add(direction.multiplyScalar(enemy.speed));
-
-      if (enemy.object.position.z <= player.enemyTarget!.z) {
-        this.removeEnemy(enemy, index);
-      }
-
-      // Rotate the enemy to face the player (ALL AXIS)
-      // const lookAtPosition = new THREE.Vector3().copy(player.position!);
-      // enemy.lookAt(lookAtPosition);
-
-      // Calculate rotation to face the player around the y-axis (YAW rotation)
-      const angle = Math.atan2(direction.x, direction.z); // Calculate the yaw angle
-      enemy.object.rotation.y = angle; // Set the y-axis rotation
-
-      const distanceToPlayer = enemy.object.position.distanceTo(player.position!);
+  private checkCollisionWithPlayer(enemy: Enemy, index: number, player: Player) {
+    const distanceToPlayer = enemy.object.position.distanceTo(player.position!);
       if (distanceToPlayer < 1) {
         player.takeDamage(0);
         this.removeEnemy(enemy, index);
       }
-    }
-    );
+  }
 
-    // Check for collisions
-    this.checkCollisions();
+  private rotateEnemyToFacePlayer(enemy: Enemy, player: Player) {
+      const direction = new THREE.Vector3();
+      direction.subVectors(player.position!, enemy.object.position).normalize();
+      // Rotate the enemy to face the player (ALL AXIS) 
+      // probably better long term !!!!!
+      // const lookAtPosition = new THREE.Vector3().copy(player.position!);
+      // enemy.lookAt(lookAtPosition);
+
+      // Calculate rotation to face the player around the y-axis (YAW) 
+      // used for looks short term, rotate enemy mesh instead of avoiding other axis !!!
+      const angle = Math.atan2(direction.x, direction.z); // Calculate the yaw angle
+      enemy.object.rotation.y = angle; // Set the y-axis rotation
+  }
+
+  private updateEnemyPosition(enemy: Enemy, index: number, player: Player) {
+    const direction = new THREE.Vector3();
+
+    direction.subVectors(player.enemyTarget!, enemy.object.position).normalize();
+    enemy.object.position.add(direction.multiplyScalar(enemy.speed));
+
+    // Remove enemy if it passes the target
+    if (enemy.object.position.z <= player.enemyTarget!.z) {
+      this.removeEnemy(enemy, index);
+    }
   }
 
   public getEnemies(): Enemy[] {

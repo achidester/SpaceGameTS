@@ -1,5 +1,24 @@
 import * as THREE from 'three';
 
+const ProjectileConfig = {
+  geometry: {
+    radiusTop: 0.025,
+    radiusBottom: 0.025,
+    height: 2,
+    radialSegments: 16,
+  },
+  material: {
+    color: 0x0bff3f,
+    emissive: 0xfcba03,
+    emissiveIntensity: 1.25,
+  },
+  rotation: {
+    x: Math.PI / 2,
+  },
+  defaultSpeed: 0.5,
+  defaultMaxRange: 50,
+};
+
 export class Projectile {
   mesh: THREE.Mesh;
   velocity: THREE.Vector3;
@@ -7,18 +26,23 @@ export class Projectile {
   maxRange: number;
   speed: number;
 
-  constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = 50) {
+  constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = ProjectileConfig.defaultMaxRange) {
     this.mesh = new THREE.Mesh(
-      new THREE.CylinderGeometry( .025, .025, 2, 16 ),
+      new THREE.CylinderGeometry(
+        ProjectileConfig.geometry.radiusTop, 
+        ProjectileConfig.geometry.radiusBottom, 
+        ProjectileConfig.geometry.height, 
+        ProjectileConfig.geometry.radialSegments 
+      ),
       new THREE.MeshStandardMaterial({
-        color: 0x0BFF3F,
-        emissive: 0xfcba03,
-        emissiveIntensity: 1.25, // Increase for stronger glow
+        color: ProjectileConfig.material.color,
+        emissive: ProjectileConfig.material.emissive,
+        emissiveIntensity: ProjectileConfig.material.emissiveIntensity, // Increase for stronger glow
       }) 
     );
-    this.mesh.rotation.x = Math.PI / 2
+    this.mesh.rotation.x = ProjectileConfig.rotation.x
     this.mesh.position.copy(position);
-    this.speed = .5 // intense curve here. 
+    this.speed = ProjectileConfig.defaultSpeed // intense curve here. 
 
     // Track the start position to calculate travel distance
     this.startPosition = position.clone();

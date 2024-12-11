@@ -62,7 +62,7 @@ export class EnemyManager {
     const spawnPosition = this.getSpawnPosition(playerPosition);
 
     try {
-      const enemy = await this.enemyFactory.createEnemy();
+      const enemy = await this.enemyFactory.createEnemy({}, spawnPosition);
       enemy.object.position.copy(spawnPosition);
 
       this.gameState.scene.add(enemy.object);

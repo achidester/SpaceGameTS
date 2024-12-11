@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import { ResourceManager } from '../managers';
 import { Enemy } from '../components/enemy';
 
@@ -9,16 +10,10 @@ export class EnemyFactory {
       this.resourceManager = new ResourceManager();
     }
   
-    async createEnemy(customProperties: { speed?: number; size?: number } = {}): Promise<Enemy> {
+    async createEnemy(customProperties: { speed?: number; size?: number } = {}, spawnPosition: THREE.Vector3): Promise<Enemy> {
       const enemyModel = await this.resourceManager.loadModel('../models/enemyship_v1.glb');
-  
       enemyModel.rotation.x = -Math.PI / 10;
-      enemyModel.position.set(
-        Math.random() * (25 - 15) + 15,
-        0,
-        Math.random() * (25 - 15) + 15
-      );
-  
+      enemyModel.position.copy(spawnPosition);
       return new Enemy(enemyModel, customProperties);
     }
   }

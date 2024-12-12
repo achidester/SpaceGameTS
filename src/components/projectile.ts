@@ -73,14 +73,12 @@ export class Projectile {
     this.adjustBeamDirection();
 
     if (this.hasExceededRange()) {
-      console.log('Projectile exceeded range, removing:', this.mesh.uuid);
       gameState.scene.remove(this.mesh);
       this.scheduledForRemoval = true;
       return;
     }
 
     if (this.pierceCount <= 0 && !this.scheduledForRemoval) {
-      console.log('Projectile pierce count is 0, scheduling removal.');
       setTimeout(() => {
         gameState.scene.remove(this.mesh);
         this.scheduledForRemoval = true;
@@ -88,22 +86,29 @@ export class Projectile {
       return;
     }
 
+    this.raycaster.params.Line = { threshold: 2 }; // Increase this value for wider hit detection
+    
     this.raycaster.set(this.mesh.position, this.velocity);
     const intersects = this.raycaster.intersectObjects(enemies, true);
+
 
     intersects.forEach(intersect => {
       let targetObject = intersect.object;
       while (targetObject.parent && targetObject.parent.type !== 'Scene') {
         targetObject = targetObject.parent;
       }
+      
 
       if (!this.enemiesHit.has(targetObject) && this.pierceCount > 0) {
         this.enemiesHit.add(targetObject);
         this.pierceCount--;
 
         const distanceToEnemy = this.mesh.position.distanceTo(intersect.point);
+        const rawTimeToImpact = distanceToEnemy / this.speed
         const maxTimeToImpact = 0.5;
-        const timeToImpact = Math.min(distanceToEnemy / this.speed, maxTimeToImpact);
+
+        const timeToImpact = Math.min(rawTimeToImpact, maxTimeToImpact);
+        console.log('Adjusted time to impact:', timeToImpact);
 
         setTimeout(() => {
           if (this.onEnemyHitCallback) {

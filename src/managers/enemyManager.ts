@@ -99,16 +99,10 @@ export class EnemyManager {
   
     const enemyIndex = this.enemies.findIndex(enemy => enemy.object.uuid === resolvedObject.uuid);
     if (enemyIndex !== -1) {
-      console.log('Enemy found and scheduled for removal:', resolvedObject.uuid);
-  
-      // Optionally make the enemy invisible immediately for feedback
-      resolvedObject.visible = true;
-  
-      setTimeout(() => {
-        console.log('Removing enemy from scene and array:', resolvedObject.uuid);
-        this.removeEnemy(this.enemies[enemyIndex], enemyIndex);
-        this.gameState.addScore(ENEMY_KILL_SCORE);
-      }, 100); // Adjust delay if needed
+      console.log('Removing enemy from scene and array:', resolvedObject.uuid);
+      this.removeEnemy(this.enemies[enemyIndex], enemyIndex);
+      this.gameState.addScore(ENEMY_KILL_SCORE);
+
     } else {
       console.error('Enemy not found for hit:', resolvedObject.uuid);
     }

@@ -30,7 +30,6 @@ function animate() {
     }
 
     gameState.projectiles.forEach(projectile => {
-      console.log('Updating projectile:', projectile.mesh.uuid);
       projectile.update();
     });
 

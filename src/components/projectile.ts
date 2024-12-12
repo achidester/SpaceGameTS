@@ -82,12 +82,12 @@ export class Projectile {
       setTimeout(() => {
         gameState.scene.remove(this.mesh);
         this.scheduledForRemoval = true;
-      }, 100);
+      }, 200);
       return;
     }
 
-    this.raycaster.params.Line = { threshold: 2 }; // Increase this value for wider hit detection
-    
+    this.raycaster.params.Line = { threshold: 10 }; // Increase this value for wider hit detection
+
     this.raycaster.set(this.mesh.position, this.velocity);
     const intersects = this.raycaster.intersectObjects(enemies, true);
 
@@ -116,7 +116,7 @@ export class Projectile {
           }
           gameState.scene.remove(this.mesh);
           this.scheduledForRemoval = true;
-        }, timeToImpact * 1000);
+        }, timeToImpact * 500 ); // originally set to 1000 to convert ms, but this is better for removal time
       }
     });
   }

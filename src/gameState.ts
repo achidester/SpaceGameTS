@@ -10,9 +10,9 @@ class GameState {
   scene!: THREE.Scene;
   camera!: THREE.PerspectiveCamera;
   composer!: EffectComposer;
+  enemyManager!: EnemyManager;
   player!: Player;
   reticle!: THREE.Object3D;
-  enemyManager!: EnemyManager;
   stats!: Stats;
   ui!: UI;
   projectiles: Projectile[] = [];
@@ -27,7 +27,9 @@ class GameState {
 
   public static getInstance(): GameState {
     if (!GameState.instance) {
+      console.log('Initializing GameState'); // Debug log
       GameState.instance = new GameState();
+      console.log('GameState initialized:', GameState.instance); // Debug log
     }
     return GameState.instance;
   }

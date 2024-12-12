@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { Projectile } from './projectile';
 import GameState from '../gameState';
-
+import { EnemyManager } from '../managers';
 
 export class Player {
   private readonly gameState = GameState.getInstance();
+  private enemyManager: EnemyManager
 
   mesh: THREE.Object3D | null = null; // Mesh starts as null until player model is loaded. 
   fireRate: number;
@@ -16,6 +17,10 @@ export class Player {
   private shootingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private playerModel: THREE.Object3D) {
+    console.log('GameState.enemyManager:', this.gameState.enemyManager); // Debug log
+    console.log('Player constructor called'); // Debug log
+    console.log('EnemyManager:', this.gameState.enemyManager); // Debug EnemyManager
+    this.enemyManager = this.gameState.enemyManager;
     this.mesh = this.playerModel
     this.fireRate = 320;
     this.maxHealth = 100;
@@ -59,10 +64,15 @@ export class Player {
 
   public shoot(): void {
     if (!this.canShoot()) return; 
+    console.log('Player shooting'); // Debug log
     this.lastShotTime = performance.now();
     const targetPosition = this.getTargetFromReticle()
     ;
-    if (!targetPosition) return;
+    if (!targetPosition){ 
+      console.log('No target position'); // Debug log
+      return;
+    }
+
     const projectile = this.createProjectile(targetPosition);
     this.addProjectileToScene(projectile);
     this.trackProjectile(projectile);
@@ -74,8 +84,17 @@ export class Player {
   }
 
   private createProjectile(targetPosition: THREE.Vector3): Projectile {
+    console.log('Creating projectile'); // Debug log
     const direction = this.calculateDirectionToTarget(targetPosition);
-    return new Projectile(this.mesh!.position, direction);
+
+    return new Projectile(
+      this.mesh!.position.clone(),
+      direction, 
+      undefined, // maxRange
+      undefined, // pierceCount
+      this.enemyManager.handleEnemyHit.bind(this.enemyManager) // Callback to handle hits
+    );
+    
   }
 
   private calculateDirectionToTarget(targetPosition: THREE.Vector3): THREE.Vector3 {
@@ -85,6 +104,7 @@ export class Player {
   }
 
   private addProjectileToScene(projectile: Projectile): void {
+    console.log('Adding projectile to scene:', projectile.mesh); // Debug log
     this.gameState.scene.add(projectile.mesh);
   }
 

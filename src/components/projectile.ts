@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import GameState from '../gameState';
 
 const ProjectileConfig = {
   geometry: {
@@ -17,6 +18,7 @@ const ProjectileConfig = {
   },
   defaultSpeed: 0.5,
   defaultMaxRange: 50,
+  defaultPierceCount: 1,
 };
 
 export class Projectile {
@@ -25,59 +27,104 @@ export class Projectile {
   startPosition: THREE.Vector3;
   maxRange: number;
   speed: number;
+  pierceCount: number;
+  raycaster: THREE.Raycaster;
+  enemiesHit: Set<THREE.Object3D>;
+  onEnemyHitCallback?: (enemy: THREE.Object3D) => void;
+  public scheduledForRemoval: boolean = false;
 
-  constructor(position: THREE.Vector3, direction: THREE.Vector3, maxRange: number = ProjectileConfig.defaultMaxRange) {
+  constructor(
+    position: THREE.Vector3,
+    direction: THREE.Vector3,
+    maxRange: number = ProjectileConfig.defaultMaxRange,
+    pierceCount: number = ProjectileConfig.defaultPierceCount,
+    onEnemyHitCallback?: (enemy: THREE.Object3D) => void
+  ) {
     this.mesh = new THREE.Mesh(
       new THREE.CylinderGeometry(
-        ProjectileConfig.geometry.radiusTop, 
-        ProjectileConfig.geometry.radiusBottom, 
-        ProjectileConfig.geometry.height, 
-        ProjectileConfig.geometry.radialSegments 
+        ProjectileConfig.geometry.radiusTop,
+        ProjectileConfig.geometry.radiusBottom,
+        ProjectileConfig.geometry.height,
+        ProjectileConfig.geometry.radialSegments
       ),
       new THREE.MeshStandardMaterial({
         color: ProjectileConfig.material.color,
         emissive: ProjectileConfig.material.emissive,
-        emissiveIntensity: ProjectileConfig.material.emissiveIntensity, // Increase for stronger glow
-      }) 
+        emissiveIntensity: ProjectileConfig.material.emissiveIntensity,
+      })
     );
-    this.mesh.rotation.x = ProjectileConfig.rotation.x
+    this.mesh.rotation.x = ProjectileConfig.rotation.x;
     this.mesh.position.copy(position);
-    this.speed = ProjectileConfig.defaultSpeed // intense curve here. 
-
-    // Track the start position to calculate travel distance
+    this.speed = ProjectileConfig.defaultSpeed;
     this.startPosition = position.clone();
     this.maxRange = maxRange;
-
-    // Set the initial velocity based on the direction and speed
+    this.pierceCount = pierceCount;
     this.velocity = direction.clone().normalize();
+    this.raycaster = new THREE.Raycaster(position, direction.clone().normalize());
+    this.enemiesHit = new Set();
+    this.onEnemyHitCallback = onEnemyHitCallback;
   }
 
-  update() {
-    // Move the projectile according to its velocity
+  update(): void {
+    const gameState = GameState.getInstance();
+    const enemies = gameState.enemyManager.getEnemies().map(enemy => enemy.object);
+
     this.mesh.position.add(this.velocity.clone().multiplyScalar(this.speed));
-    this.adjustBeamDirection()
+    this.adjustBeamDirection();
+
+    if (this.hasExceededRange()) {
+      console.log('Projectile exceeded range, removing:', this.mesh.uuid);
+      gameState.scene.remove(this.mesh);
+      this.scheduledForRemoval = true;
+      return;
+    }
+
+    if (this.pierceCount <= 0 && !this.scheduledForRemoval) {
+      console.log('Projectile pierce count is 0, scheduling removal.');
+      setTimeout(() => {
+        gameState.scene.remove(this.mesh);
+        this.scheduledForRemoval = true;
+      }, 100);
+      return;
+    }
+
+    this.raycaster.set(this.mesh.position, this.velocity);
+    const intersects = this.raycaster.intersectObjects(enemies, true);
+
+    intersects.forEach(intersect => {
+      let targetObject = intersect.object;
+      while (targetObject.parent && targetObject.parent.type !== 'Scene') {
+        targetObject = targetObject.parent;
+      }
+
+      if (!this.enemiesHit.has(targetObject) && this.pierceCount > 0) {
+        this.enemiesHit.add(targetObject);
+        this.pierceCount--;
+
+        const distanceToEnemy = this.mesh.position.distanceTo(intersect.point);
+        const maxTimeToImpact = 0.5;
+        const timeToImpact = Math.min(distanceToEnemy / this.speed, maxTimeToImpact);
+
+        setTimeout(() => {
+          if (this.onEnemyHitCallback) {
+            this.onEnemyHitCallback(targetObject);
+          }
+          gameState.scene.remove(this.mesh);
+          this.scheduledForRemoval = true;
+        }, timeToImpact * 1000);
+      }
+    });
   }
 
-  adjustBeamDirection() {
+  adjustBeamDirection(): void {
     const direction = this.velocity.clone().normalize();
-    const axis = new THREE.Vector3(0, 1, 0); // Default cylinder up direction
+    const axis = new THREE.Vector3(0, 1, 0);
     const quaternion = new THREE.Quaternion().setFromUnitVectors(axis, direction);
     this.mesh.quaternion.copy(quaternion);
   }
 
-  hasExceededRange(customMaxRange?: number): boolean {
-    const range = customMaxRange ?? this.maxRange;
+  hasExceededRange(): boolean {
     const distance = this.mesh.position.distanceTo(this.startPosition);
-    return distance > range;
-  }
-
-  destroy(): void {
-    // Dispose of geometry and material resources
-    if (this.mesh.geometry instanceof THREE.BufferGeometry) {
-      this.mesh.geometry.dispose();
-    }
-    if (this.mesh.material instanceof THREE.Material) {
-      this.mesh.material.dispose();
-    }
+    return distance > this.maxRange;
   }
 }

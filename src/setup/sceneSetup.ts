@@ -24,18 +24,6 @@ export async function setupScene(
   const ambientLight = new THREE.AmbientLight(0xffffff, 0.5); // Soft white light
   scene.add(ambientLight);
 
-  // I THINK I NEED A SPOTLIGHT RATHER THAN A DIRECTIONAL LIGHT
-  const dLightX = 0
-  const dLightY = 0
-  const dLightZ = 1
-
-  const directionalLight = new THREE.DirectionalLight(0xfff2cf, 1);
-  directionalLight.position.set(dLightX, dLightY , dLightZ ); // (x, y, z)
-  scene.add(directionalLight);
-
-  const helper = new THREE.DirectionalLightHelper( directionalLight, 1 );
-  scene.add( helper );
-
   // Grid Helpers
   const gridHelper = new THREE.GridHelper(200, 6);
   gridHelper.rotation.x = Math.PI / 2; // Rotate 90 degrees around the X-axis

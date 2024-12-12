@@ -23,39 +23,32 @@ function animate() {
 
   function loop() {
     requestAnimationFrame(loop);
-    
-    if (gameState.isLoading || gameState.isPaused()) {
+
+    if (gameState.isLoading || gameState.isPaused() || gameState.player.health <= 0) {
       document.exitPointerLock();
       return;
     }
 
-    if (gameState.player.health <= 0) {
-      document.exitPointerLock();
-      return;
-    }
-
-    gameState.projectiles.forEach((projectile, index) => {
+    gameState.projectiles.forEach(projectile => {
+      console.log('Updating projectile:', projectile.mesh.uuid);
       projectile.update();
-      if (projectile.hasExceededRange()) {
-        gameState.scene.remove(projectile.mesh);
-        gameState.projectiles.splice(index, 1);
-      }
     });
 
-    const elapsedPlayTime = gameState.getPlayTime(); // Get total playtime
+    gameState.enemyManager.update();
 
     updateObjectPosition(gameState.player, gameState.camera);
     gameState.player.mesh!.lookAt(gameState.reticle.getWorldPosition(new THREE.Vector3()));
-    gameState.enemyManager.update(elapsedPlayTime);
 
-    // Use composer if post-processing is needed
-    if (gameState.composer) { gameState.composer.render(); } 
-    else { gameState.renderer.render(gameState.scene, gameState.camera); }
+    if (gameState.composer) {
+      gameState.composer.render();
+    } else {
+      gameState.renderer.render(gameState.scene, gameState.camera);
+    }
 
     gameState.stats.update();
-    
-    gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime(), gameState.getScore())
+    gameState.ui.drawUI(gameState.player.health, gameState.getPlayTime(), gameState.getScore());
   }
+
   loop();
 }
 
@@ -69,11 +62,13 @@ async function initializeGame() {
     const { camera } = setupCamera();
     const { scene, composer } = await setupScene(renderer, camera); 
 
-    const player = await playerFactory.createPlayer();
+    const enemyManager = new EnemyManager(2000); // Initialize EnemyManager first
+    gameState.enemyManager = enemyManager; // Assign to GameState early
+
+    const player = await playerFactory.createPlayer(); // Create Player after EnemyManager is assigned
     const ui = setupGameUI(player.maxHealth);
     const stats = setupStats();
     const reticle = createReticle(camera, scene);
-    const enemyManager = new EnemyManager(2000);
 
     scene.add(player.mesh!);
     setupDevGUI(camera);
@@ -88,8 +83,8 @@ async function initializeGame() {
     gameState.reticle = reticle;
     gameState.ui = ui;
     gameState.stats = stats;
-    gameState.enemyManager = enemyManager
     gameState.setGameInitialized(true);
+
     console.log('Game initialization complete.');
   } catch (error) {
     console.error('Error during game initialization:', error);

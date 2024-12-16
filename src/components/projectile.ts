@@ -3,8 +3,8 @@ import GameState from '../gameState';
 
 const ProjectileConfig = {
   geometry: {
-    radiusTop: 0.025,
-    radiusBottom: 0.025,
+    radiusTop: 0.1,
+    radiusBottom: 0.1,
     height: 2,
     radialSegments: 16,
   },
@@ -16,7 +16,7 @@ const ProjectileConfig = {
   rotation: {
     x: Math.PI / 2,
   },
-  defaultSpeed: 0.5,
+  defaultSpeed: 1,
   defaultMaxRange: 50,
   defaultPierceCount: 1,
 };
@@ -65,71 +65,82 @@ export class Projectile {
     this.onEnemyHitCallback = onEnemyHitCallback;
   }
 
-  update(): void {
-    const gameState = GameState.getInstance();
-    const enemies = gameState.enemyManager.getEnemies().map(enemy => enemy.object);
-
-    this.mesh.position.add(this.velocity.clone().multiplyScalar(this.speed));
+  public update(): void {
+    this.move();
     this.adjustBeamDirection();
 
-    if (this.hasExceededRange()) {
-      gameState.scene.remove(this.mesh);
-      this.scheduledForRemoval = true;
-      return;
-    }
-
+    // Remove immediately if out of range
+    if (this.hasExceededRange()) { this.scheduleRemoval(); }
+    // Remove delayed if scheduled for delay (delay for animation)
     if (this.pierceCount <= 0 && !this.scheduledForRemoval) {
-      setTimeout(() => {
-        gameState.scene.remove(this.mesh);
-        this.scheduledForRemoval = true;
-      }, 200);
-      return;
+      setTimeout(() => { this.scheduleRemoval }, 200);
     }
-
-    this.raycaster.params.Line = { threshold: 10 }; // Increase this value for wider hit detection
-
-    this.raycaster.set(this.mesh.position, this.velocity);
-    const intersects = this.raycaster.intersectObjects(enemies, true);
-
-
-    intersects.forEach(intersect => {
-      let targetObject = intersect.object;
-      while (targetObject.parent && targetObject.parent.type !== 'Scene') {
-        targetObject = targetObject.parent;
-      }
-      
-
-      if (!this.enemiesHit.has(targetObject) && this.pierceCount > 0) {
-        this.enemiesHit.add(targetObject);
-        this.pierceCount--;
-
-        const distanceToEnemy = this.mesh.position.distanceTo(intersect.point);
-        const rawTimeToImpact = distanceToEnemy / this.speed
-        const maxTimeToImpact = 0.5;
-
-        const timeToImpact = Math.min(rawTimeToImpact, maxTimeToImpact);
-        console.log('Adjusted time to impact:', timeToImpact);
-
-        setTimeout(() => {
-          if (this.onEnemyHitCallback) {
-            this.onEnemyHitCallback(targetObject);
-          }
-          gameState.scene.remove(this.mesh);
-          this.scheduledForRemoval = true;
-        }, timeToImpact * 500 ); // originally set to 1000 to convert ms, but this is better for removal time
-      }
-    });
+    
+    this.checkCollisions();
   }
 
-  adjustBeamDirection(): void {
+  private move(): void {
+    this.mesh.position.add(this.velocity.clone().multiplyScalar(this.speed));
+  }
+
+  private scheduleRemoval(): void {
+    const gameState = GameState.getInstance();
+    gameState.scene.remove(this.mesh);
+    this.scheduledForRemoval = true;
+  }
+  private adjustBeamDirection(): void {
     const direction = this.velocity.clone().normalize();
     const axis = new THREE.Vector3(0, 1, 0);
     const quaternion = new THREE.Quaternion().setFromUnitVectors(axis, direction);
     this.mesh.quaternion.copy(quaternion);
   }
 
-  hasExceededRange(): boolean {
+  private hasExceededRange(): boolean {
     const distance = this.mesh.position.distanceTo(this.startPosition);
     return distance > this.maxRange;
   }
+
+  private checkCollisions(): void {
+    const gameState = GameState.getInstance();
+    const enemies = gameState.enemyManager.getEnemies().map(enemy => enemy.object);
+
+    this.raycaster.params.Line = { threshold: 5 }; // Adjust for thicker raycaster line
+    this.raycaster.params.Mesh = { threshold: 5 }; // Adjust for wider collision detection
+    this.raycaster.set(this.mesh.position, this.velocity);
+
+    const intersects = this.raycaster.intersectObjects(enemies, true);
+    
+    intersects.forEach(intersect => this.handleIntersection(intersect));
+  }
+
+  private handleIntersection(intersect: THREE.Intersection): void {
+    let targetObject = intersect.object;
+
+    while (targetObject.parent && targetObject.parent.type !== 'Scene') {
+      targetObject = targetObject.parent;
+    }
+
+    if (!this.enemiesHit.has(targetObject) && this.pierceCount > 0) {
+
+      this.enemiesHit.add(targetObject);
+      this.pierceCount--;
+
+      const distanceToEnemy = this.mesh.position.distanceTo(intersect.point);
+      const rawTimeToImpact = distanceToEnemy / this.speed;
+      const maxTimeToImpact = 0.5;
+      const timeToImpact = Math.min(rawTimeToImpact, maxTimeToImpact);
+
+      
+      setTimeout(() => {
+        if (this.onEnemyHitCallback) {
+          this.onEnemyHitCallback!(targetObject);
+        }else {
+          console.warn('No callback defined for this projectile.');
+        }
+        this.scheduleRemoval();
+      }, timeToImpact * 500);
+    }
+  }
+  
+
 }

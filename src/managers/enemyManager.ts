@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import GameState from '../gameState';
-import { Player, Projectile, Enemy } from '../components';
+import { Player, Enemy } from '../components';
 import { EnemyFactory } from '../factories/enemyFactory';
 
 const MIN_SPAWN_DISTANCE = 15;
@@ -25,11 +25,12 @@ export class EnemyManager {
   public update(): void {
     const playTime = this.gameState.getPlayTime();
     const minSpawnInterval = 200; // Min spawn interval in milliseconds
-    const baseSpawnInterval = 2000; // Base spawn interval in milliseconds
+    const baseSpawnInterval = 1000; // Base spawn interval in milliseconds
     const intensityFactor = 1; // Scaling intensity for faster enemy spawns (set to 50 for crazy fast spawns)
     const currentSpawnInterval = Math.max(minSpawnInterval, baseSpawnInterval / Math.pow(1 + playTime / 60000, intensityFactor));
     this.spawnInterval = currentSpawnInterval;
     const isSpawnTime = Date.now() - this.enemySpawnTimer > this.spawnInterval;
+    const player = this.gameState.player;
 
     if (isSpawnTime) {
       this.spawnEnemy();
@@ -37,11 +38,9 @@ export class EnemyManager {
     }
 
     this.enemies.forEach((enemy, index) => {
-      const player = this.gameState.player;
       this.updateEnemyPosition(enemy, index, player);
       this.rotateEnemyToFacePlayer(enemy, player);
       this.checkCollisionWithPlayer(enemy, index, player);
-      this.checkCollisionsWithProjectiles();
     });
 
   }
@@ -64,11 +63,12 @@ export class EnemyManager {
     const spawnPosition = this.getSpawnPosition(playerPosition);
 
     try {
-      const enemy = await this.enemyFactory.createEnemy({}, spawnPosition);
-      console.log('Spawning enemy:', enemy.object.uuid);
+      const enemy = await this.enemyFactory.createEnemy({ }, spawnPosition);
       enemy.object.position.copy(spawnPosition);
-
+  
+      
       this.gameState.scene.add(enemy.object);
+      
       this.enemies.push(enemy);
     } catch (error) {
       console.error('Failed to spawn enemy:', error);
@@ -76,36 +76,22 @@ export class EnemyManager {
   }
 
   private removeEnemy(enemy: Enemy, index: number): void {
-    console.log('Removing enemy from scene:', enemy.object.uuid);
     this.gameState.scene.remove(enemy.object);
-  
-    console.log('Removing enemy from array at index:', index);
     this.enemies.splice(index, 1);
   }
 
-  private checkCollisionsWithProjectiles(): void {
-    this.gameState.projectiles.forEach(projectile => {
-      projectile.update();
-    });
-  }
 
   public handleEnemyHit(enemyObject: THREE.Object3D): void {
-    console.log('Checking enemy hit for:', enemyObject.uuid);
-  
     let resolvedObject = enemyObject;
     while (resolvedObject.parent && resolvedObject.parent.type !== 'Scene') {
       resolvedObject = resolvedObject.parent;
     }
-  
     const enemyIndex = this.enemies.findIndex(enemy => enemy.object.uuid === resolvedObject.uuid);
     if (enemyIndex !== -1) {
-      console.log('Removing enemy from scene and array:', resolvedObject.uuid);
       this.removeEnemy(this.enemies[enemyIndex], enemyIndex);
       this.gameState.addScore(ENEMY_KILL_SCORE);
 
-    } else {
-      console.error('Enemy not found for hit:', resolvedObject.uuid);
-    }
+    } 
   }
 
   private checkCollisionWithPlayer(enemy: Enemy, index: number, player: Player) {

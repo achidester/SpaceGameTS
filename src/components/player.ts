@@ -17,9 +17,6 @@ export class Player {
   private shootingInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(private playerModel: THREE.Object3D) {
-    console.log('GameState.enemyManager:', this.gameState.enemyManager); // Debug log
-    console.log('Player constructor called'); // Debug log
-    console.log('EnemyManager:', this.gameState.enemyManager); // Debug EnemyManager
     this.enemyManager = this.gameState.enemyManager;
     this.mesh = this.playerModel
     this.fireRate = 320;
@@ -64,29 +61,42 @@ export class Player {
 
   public shoot(): void {
     if (!this.canShoot()) return; 
-    console.log('Player shooting'); // Debug log
     this.lastShotTime = performance.now();
-    const targetPosition = this.getTargetFromReticle()
-    ;
+    const targetPosition = this.getTargetFromReticle();
     if (!targetPosition){ 
-      console.log('No target position'); // Debug log
       return;
     }
 
     const projectile = this.createProjectile(targetPosition);
     this.addProjectileToScene(projectile);
+
+    // DEV RAYCASTER LINE
+    // const raycastLine = new THREE.ArrowHelper(projectile.raycaster.ray.direction, projectile.raycaster.ray.origin, 300, 0xff0000, .3, 5)
+    // this.gameState.scene.add(raycastLine);
+
     this.trackProjectile(projectile);
   }
 
 
   private getTargetFromReticle(): THREE.Vector3 | null {
+  
+    // Ensure the reticle exists
+    if (!this.gameState.reticle || !this.gameState.reticle.position) {
+      console.warn("Reticle or its position not found in GameState.");
+      return null;
+    }
+  
+    // Directly return the reticle's position
+    const targetPosition = this.gameState.reticle.position;
+    console.log("Reticle Position:", targetPosition);
+    return targetPosition;
+
     return this.gameState.reticle?.getWorldPosition(new THREE.Vector3()) || null;
   }
 
   private createProjectile(targetPosition: THREE.Vector3): Projectile {
-    console.log('Creating projectile'); // Debug log
     const direction = this.calculateDirectionToTarget(targetPosition);
-
+    
     return new Projectile(
       this.mesh!.position.clone(),
       direction, 
@@ -104,7 +114,6 @@ export class Player {
   }
 
   private addProjectileToScene(projectile: Projectile): void {
-    console.log('Adding projectile to scene:', projectile.mesh); // Debug log
     this.gameState.scene.add(projectile.mesh);
   }
 

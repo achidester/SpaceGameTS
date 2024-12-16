@@ -14,9 +14,11 @@ export class EnemyFactory {
       const enemyModel = await this.resourceManager.loadModel('../models/enemyship_v1.glb');
       enemyModel.name = 'Enemy'; // Optional, for debugging
       enemyModel.uuid = THREE.MathUtils.generateUUID(); // Generate a consistent UUID
-      console.log('Assigned UUID to enemyModel:', enemyModel.uuid); // Debug log
-      enemyModel.rotation.x = -Math.PI / 10;
+      enemyModel.rotation.x = -Math.PI /10 ;
+      
       enemyModel.position.copy(spawnPosition);
+      
+
       return new Enemy(enemyModel, customProperties);
     }
   }
